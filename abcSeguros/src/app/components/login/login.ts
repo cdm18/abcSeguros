@@ -1,28 +1,38 @@
+// login.ts
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth'; // Ajusta la ruta
+import { CommonModule, NgIf } from '@angular/common';
+import { FormsModule }        from '@angular/forms';   // ← camino correcto
+import { Router }             from '@angular/router';
+import { ApiService }         from '../../services/api';
+import { AuthService }        from '../../services/auth';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, FormsModule], // Importando CommonModule y FormsModule para soporte de formularios
+  selector   : 'app-login',
+  standalone : true,
+  imports    : [CommonModule, FormsModule, NgIf],
   templateUrl: './login.html',
-  styleUrls: ['./login.css'],
+  styleUrls  : ['./login.css']
 })
 export class LoginComponent {
-  username: string = '';
-  password: string = '';
-  errorMessage: string = '';
+  username = '';
+  password = '';
+  errorMessage = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private api : ApiService,
+    private auth: AuthService,
+    private router: Router
+  ) {
+    if (this.auth.isAuth()) this.router.navigate(['/dashboard']);
+  }
 
-  onLogin(): void {
-    if (this.authService.login(this.username, this.password)) {
-      this.errorMessage = '';
-      console.log('Login exitoso');
-    } else {
-      this.errorMessage = 'Credenciales incorrectas';
-    }
+  onLogin() {
+    this.api.login(this.username, this.password).subscribe({
+      next: (res: any) => {              // ← tipa como any o define interfaz
+        this.auth.setSession(res.user);  // res.user ahora es válido
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => this.errorMessage = 'Credenciales incorrectas'
+    });
   }
 }

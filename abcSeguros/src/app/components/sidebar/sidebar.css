@@ -1,0 +1,16 @@
+.sidebar {
+  width: 260px;
+  transition: all .3s
+}
+
+@media (max-width: 991px) {
+  .sidebar {
+    position: fixed;
+    z-index: 1030;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.show {
+    transform: none
+  }
+}

@@ -1,36 +1,64 @@
 const express = require('express');
-const mysql = require('mysql2');
-const app = express();
-const port = 3000;
+const mysql   = require('mysql2');
+const cors    = require('cors');
 
-// Crear la conexión con la base de datos MySQL
+const app  = express();
+app.use(express.json());
+app.use(cors());             // permite peticiones desde localhost:4200
+
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'piloto12', // Reemplaza con tu contraseña de MySQL
-    database: 'abcSeguros'  // Reemplaza con el nombre de tu base de datos
+    host    : 'localhost',
+    user    : 'root',        // ← tu usuario
+    password: 'piloto12',        // ← tu contraseña
+    database: 'abcSeguros'  // ← tu base
 });
 
-db.connect((err) => {
-    if (err) {
-        console.error('Error de conexión a la base de datos: ' + err.stack);
-        return;
-    }
-    console.log('Conexión a la base de datos MySQL establecida');
-});
 
-// Configurar una ruta para probar la conexión
-app.get('/api/users', (req, res) => {
-    db.query('SELECT * FROM users', (err, results) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    db.query(
+        'SELECT * FROM users WHERE username = ? AND password = ?',
+        [username, password],
+        (err, rows) => {
+            if (err)   return res.status(500).json({ error: err.message });
+            if (!rows.length) return res.status(401).json({ message: 'Credenciales incorrectas' });
+            res.json({ message: 'Login OK', user: rows[0] });
         }
-        res.json(results);
-    });
+    );
 });
 
-// Iniciar el servidor
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
+app.listen(3000, () => console.log('Backend en http://localhost:3000'));
+
+app.get('/api/dashboard/summary', (req, res) => {
+    const sql = `
+    SELECT
+      (SELECT COUNT(*) FROM clients)            AS totalClients,
+      (SELECT COUNT(*) FROM policies)           AS totalPolicies,
+      (SELECT COUNT(*) FROM payments WHERE status='ON_TIME')    AS onTimePayments,
+      (SELECT COUNT(*) FROM payments WHERE status='PENDING')    AS pendingPayments
+  `;
+    db.query(sql, (err, rows) =>
+        err ? res.status(500).json({error:err.message}) : res.json(rows[0])
+    );
+});
+
+// server.js  – reemplaza el endpoint antiguo
+app.get('/api/dashboard/clients', (req, res) => {
+    const sql = `
+    SELECT  c.id,
+            CONCAT(c.first_name,' ',c.last_name)       AS name,
+            c.email,
+            pl.name                                    AS plan,
+            pol.total_premium                          AS total,
+            pol.status
+    FROM clients c
+    LEFT JOIN policies pol ON pol.client_id = c.id AND pol.status='ACTIVE'
+    LEFT JOIN plans    pl  ON pl.id = pol.plan_id
+    ORDER BY c.id DESC
+    LIMIT 10;
+  `;
+    db.query(sql, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
 });

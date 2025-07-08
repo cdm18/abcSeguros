@@ -1,26 +1,29 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface User { id: number; username: string; }
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
+  private _user$ = new BehaviorSubject<User | null>(null);
+  readonly user$ = this._user$.asObservable();
 
-  constructor() { }
-
-  login(username: string, password: string): boolean {
-    // Simulando validación de credenciales
-    if (username === 'admin' && password === 'admin') {
-      localStorage.setItem('user', JSON.stringify({ username }));
-      return true;
-    }
-    return false;
+  constructor() {
+    const raw = localStorage.getItem('user');
+    if (raw) this._user$.next(JSON.parse(raw));
   }
 
-  logout(): void {
+  isAuth(): boolean { return !!this._user$.value; }
+
+  setSession(user: User) {
+    this._user$.next(user);
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  clearSession() {
+    this._user$.next(null);
     localStorage.removeItem('user');
   }
 
-  isAuthenticated(): boolean {
-    return localStorage.getItem('user') !== null;
-  }
+  get user() { return this._user$.value; }
 }
