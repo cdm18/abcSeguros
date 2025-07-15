@@ -17,6 +17,7 @@ import { LoginResponse } from '../../models/user';
 export class LoginComponent implements OnInit {
   username = '';
   password = '';
+  showPassword = false;
   errorMessage = '';
   isLoading = false;
 
@@ -59,8 +60,12 @@ export class LoginComponent implements OnInit {
   }
 
   onKeyPress(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !this.isLoading) {
       this.onLogin();
     }
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
 }

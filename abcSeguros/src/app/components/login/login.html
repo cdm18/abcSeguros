@@ -3,13 +3,33 @@
   <form (ngSubmit)="onLogin()">
     <div class="form-group">
       <label for="username">Usuario</label>
-      <input type="text" id="username" [(ngModel)]="username" name="username" class="form-control" required />
+      <input
+        id="username"
+        [(ngModel)]="username"
+        name="username"
+        class="form-control"
+        required
+      />
     </div>
-    <div class="form-group">
+    <div class="form-group password-group">
       <label for="password">Contraseña</label>
-      <input type="password" id="password" [(ngModel)]="password" name="password" class="form-control" required />
+      <div class="password-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          class="form-control"
+          required
+        />
+        <button type="button" class="toggle" (click)="togglePassword()">
+          {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
     </div>
-    <button type="submit" class="btn btn-primary">Ingresar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+      {{ isLoading ? 'Ingresando...' : 'Ingresar' }}
+    </button>
     <div *ngIf="errorMessage" class="error-message">
       <p>{{ errorMessage }}</p>
     </div>
