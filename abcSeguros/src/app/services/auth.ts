@@ -1,29 +1,40 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-
-export interface User { id: number; username: string; }
+import { BehaviorSubject, Observable } from 'rxjs';
+import { User } from '../models/user'; // Importar desde models/user.ts
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private _user$ = new BehaviorSubject<User | null>(null);
-  readonly user$ = this._user$.asObservable();
+  private userSubject = new BehaviorSubject<User | null>(null);
+  user$ = this.userSubject.asObservable();
 
   constructor() {
-    const raw = localStorage.getItem('user');
-    if (raw) this._user$.next(JSON.parse(raw));
+    // Cargar usuario desde localStorage si existe
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        this.userSubject.next(JSON.parse(savedUser));
+      } catch (error) {
+        console.error('Error parsing saved user:', error);
+        localStorage.removeItem('user');
+      }
+    }
   }
 
-  isAuth(): boolean { return !!this._user$.value; }
-
   setSession(user: User) {
-    this._user$.next(user);
+    this.userSubject.next(user);
     localStorage.setItem('user', JSON.stringify(user));
   }
 
   clearSession() {
-    this._user$.next(null);
+    this.userSubject.next(null);
     localStorage.removeItem('user');
   }
 
-  get user() { return this._user$.value; }
+  get user(): User | null {
+    return this.userSubject.value;
+  }
+
+  get isAuthenticated(): boolean {
+    return this.user !== null;
+  }
 }

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+<!-- Mi Perfil -->
+<!-- profile.html -->
+<div class="profile-container">
+  <!-- Cabecera -->
+  <header class="profile-header">
+    <h3 class="profile-title">Mi perfil</h3>
+    <p class="profile-subtitle">Actualiza tu información personal</p>
+  </header>
+
+  <!-- Tarjeta -->
+  <section class="profile-card row g-0">
+    <!-- AVATAR -------------------------------------------------------- -->
+    <div class="col-lg-4 col-md-5">
+      <div class="avatar-section">
+        <div class="avatar-wrapper">
+          <div class="avatar-container">
+            <!-- Pre-visualización -->
+            <img
+              [src]="avatarPreview || user.avatar_url || 'assets/images/default-avatar.png'"
+              class="avatar-img"
+              alt="Avatar del usuario"
+              (error)="avatarFallback($event)"
+            />
+            <!-- Overlay cámara -->
+            <div class="avatar-overlay">
+              <i class="fas fa-camera"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input de subida -->
+        <div class="upload-section">
+          <label for="avatar-upload" class="upload-label">
+            <i class="fas fa-cloud-upload-alt me-2"></i>
+            Cambiar foto
+          </label>
+          <input
+            type="file"
+            id="avatar-upload"
+            class="upload-input"
+            accept="image/png, image/jpeg"
+            (change)="onAvatarSelected($event)"
+          />
+
+          <div class="upload-info">
+            <small>
+              <i class="fas fa-info-circle me-1"></i>
+              JPG o PNG · Máx. 2 MB
+            </small>
+          </div>
+
+          <!-- Error de avatar -->
+          <div *ngIf="avatarError" class="error-message mt-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ avatarError }}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULARIO ---------------------------------------------------- -->
+    <div class="col-lg-8 col-md-7">
+      <div class="form-section">
+        <form [formGroup]="form" (ngSubmit)="save()" class="profile-form" novalidate>
+          <!-- Nombre -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-user icon-label"></i>
+              Nombre completo <span class="required">*</span>
+            </label>
+
+            <input
+              type="text"
+              class="form-control"
+              formControlName="full_name"
+              placeholder="Ingresa tu nombre completo"
+              [class.is-invalid]="isInvalid('full_name')"
+            />
+            <div *ngIf="isInvalid('full_name')" class="error-message">
+              <i class="fas fa-exclamation-triangle"></i>
+              El nombre completo es obligatorio
+            </div>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-phone icon-label"></i>
+              Teléfono
+            </label>
+            <input
+              type="tel"
+              class="form-control"
+              formControlName="phone"
+              placeholder="+593 99 123 4567"
+            />
+          </div>
+
+          <!-- Biografía -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-pen icon-label"></i>
+              Biografía
+            </label>
+            <textarea
+              rows="4"
+              class="form-control textarea-control"
+              formControlName="bio"
+              placeholder="Cuéntanos un poco sobre ti..."
+              maxlength="500"
+            ></textarea>
+            <div class="char-counter">
+              <small>{{ form.value.bio?.length || 0 }}/500 caracteres</small>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="action-buttons">
+            <button
+              type="submit"
+              class="btn btn-save"
+              [disabled]="saving || form.invalid"
+              [class.loading]="saving"
+            >
+              <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!saving" class="fas fa-save me-2"></i>
+              {{ saving ? 'Guardando…' : 'Guardar cambios' }}
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-cancel"
+              (click)="cancel()"
+              [disabled]="saving"
+            >
+              <i class="fas fa-times me-2"></i>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Simulación de funcionalidad para demostración
+  document.addEventListener('DOMContentLoaded', function () {
+    // Animación de entrada escalonada
+    const formGroups = document.querySelectorAll('.form-group');
+    formGroups.forEach((group, index) => {
+      group.style.animationDelay = `${index * 0.1}s`;
+    });
+
+    // Manejo del archivo de imagen
+    const fileInput = document.querySelector('input[type="file"]');
+    const avatarImg = document.querySelector('.avatar-img');
+
+    fileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          avatarImg.src = e.target.result;
+          avatarImg.style.animation = 'fadeInUp 0.5s ease-out';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Validación en tiempo real
+    const form = document.querySelector('form');
+    const nameInput = document.querySelector('input[type="text"]');
+    const errorMessage = document.querySelector('.error-message');
+
+    nameInput.addEventListener('blur', function () {
+      if (!this.value.trim()) {
+        this.classList.add('is-invalid');
+        errorMessage.style.display = 'flex';
+      } else {
+        this.classList.remove('is-invalid');
+        errorMessage.style.display = 'none';
+      }
+    });
+
+    // Animación del botón de envío
+    const submitBtn = document.querySelector('.btn-primary');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Simular estado de carga
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Guardando...
+                `;
+
+      // Simular respuesta después de 2 segundos
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+                        <i class="fas fa-check"></i>
+                        ¡Guardado!
+                    `;
+
+        // Volver al estado normal después de 1 segundo
+        setTimeout(() => {
+          submitBtn.innerHTML = `
+                            <i class="fas fa-save"></i>
+                            Guardar cambios
+                        `;
+        }, 1000);
+      }, 2000);
+    });
+
+    // Efecto de hover en inputs
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function () {
+        this.parentElement.style.transform = 'translateY(-1px)';
+        this.parentElement.style.transition = 'transform 0.2s ease';
+      });
+
+      input.addEventListener('blur', function () {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+  });
+</script>
+</body>
+</html>
+

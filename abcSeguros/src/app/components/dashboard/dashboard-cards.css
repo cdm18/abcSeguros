@@ -1,0 +1,2 @@
+.list-group-item{border:0;border-bottom:1px solid var(--bs-gray-200);}
+.list-group-item:last-child{border-bottom:0;}

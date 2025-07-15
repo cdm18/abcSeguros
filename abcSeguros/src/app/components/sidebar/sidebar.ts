@@ -1,22 +1,29 @@
 import { Component } from '@angular/core';
-import {AuthService} from '../../services/auth';
-import {Router} from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';   // ←  añadido
+import { AuthService } from '../../services/auth';
 
 @Component({
-  selector: 'app-sidebar',
-  imports: [],
+  selector   : 'app-sidebar',
+  standalone : true,
+  imports    : [CommonModule, RouterModule],      // ←  añadido
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css'
+  styleUrls  : ['./sidebar.css']
 })
-export class Sidebar {            // o DashboardComponent
-  constructor(private auth: AuthService, private router: Router) {}
+export class Sidebar {
+  constructor(private auth: AuthService) {}
 
   logout() {
     this.auth.clearSession();
-    this.router.navigate(['/']);
   }
   isOpen=false;
   toggleSidebar(){ this.isOpen=!this.isOpen;
     document.querySelector('.sidebar')?.classList.toggle('show',this.isOpen);}
 
+
 }
+
+
+
+
+
