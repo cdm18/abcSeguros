@@ -1,5 +1,31 @@
-@import 'bootstrap/scss/bootstrap';
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f8f9fa;
+// styles.scss
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/utilities";
+// (si quieres más módulos, impórtalos aquí)
+
+/* =========  SIDEBAR SPACING  ========= */
+:root{
+  --sidebar-expanded : 280px;   /* $sidebar-width  */
+  --sidebar-collapsed:  70px;   /* $sidebar-collapsed-width */
+}
+
+/* El wrapper del contenido */
+.app-content{
+  margin-left: var(--sidebar-collapsed);
+  padding: 1.5rem;                     /* tu gutter normal   */
+  min-height: 100vh;                   /* evita gaps          */
+  transition: margin-left .3s ease;    /* animación suave     */
+}
+
+/* Cuando el body tiene la clase .sidebar-expanded
+   empujamos todo 280 px.                                   */
+body.sidebar-expanded .app-content{
+  margin-left: var(--sidebar-expanded);
+}
+
+/* En móvil el sidebar se superpone → quitamos margen */
+@media (max-width:767.98px){
+  .app-content{ margin-left: 0 !important; }
 }

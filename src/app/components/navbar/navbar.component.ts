@@ -52,6 +52,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   /* ───────── CONST ───────── */
   private readonly MOBILE_BREAKPOINT = 768;
 
+  private syncBodyClass(): void {
+    const body = document.body;
+    body.classList.toggle('sidebar-expanded', !this._collapsed());
+    body.classList.toggle('sidebar-collapsed',  this._collapsed());
+  }
+
+
   /* ───────── Lifecycle ───────── */
   ngOnInit(): void {
     /* user */
@@ -73,6 +80,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     /* estado inicial */
     this._collapsed.set(this.isMobile());
+    this.syncBodyClass();              //  <——  arreglo
     this._currentRoute.set(this.router.url);
   }
 

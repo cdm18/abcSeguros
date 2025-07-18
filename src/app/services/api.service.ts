@@ -10,6 +10,7 @@ import { Company } from '../models/company.model';
 import { Payment } from '../models/payment.model';
 import { Quotation } from '../models/quotation.model';
 import { User } from '../models/user.model';
+import {PlanOption} from "../models/plan-option.model";
 
 export interface CreateQuotationRequest {
   client_id: number;
@@ -120,16 +121,18 @@ export class ApiService {
     return this.delete<void>(`/clients/${id}`);
   }
 
-  /* -------------- Plans -------------- */
+  /* -------------- Plans Base (PlanBase) -------------- */
   getPlans(): Observable<PlanBase[]> {
-    return this.get<PlanBase[]>('/plans');
+    return this.get<PlanBase[]>('/plan-base');
   }
 
   getPlan(id: number): Observable<PlanBase> {
-    if (!id || id <= 0) {
-      return throwError(() => new Error('ID de plan inválido'));
-    }
-    return this.get<PlanBase>(`/plans/${id}`);
+    return this.get<PlanBase>(`/plan-base/${id}`);
+  }
+
+
+  getPlanOptionsByBase(baseId:number){
+    return this.get<PlanOption[]>(`/plan-options/${baseId}/options`);
   }
 
   createPlan(data: Partial<PlanBase>): Observable<PlanBase> {

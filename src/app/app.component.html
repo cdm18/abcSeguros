@@ -1,11 +1,16 @@
+<!-- app.component.html -->
 <ng-container *ngIf="!esRutaLogin(); else soloContenido">
-  <!-- Layout con navbar, sidebar, etc -->
+
+  <!-- sidebar / navbar -->
   <app-navbar></app-navbar>
-  
-  <router-outlet></router-outlet>
+
+  <!-- nuevo contenedor de contenido -->
+  <main class="app-content">
+    <router-outlet></router-outlet>
+  </main>
+
 </ng-container>
 
 <ng-template #soloContenido>
-  <!-- Solo login, sin navbar ni sidebar -->
   <router-outlet></router-outlet>
 </ng-template>

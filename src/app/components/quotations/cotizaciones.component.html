@@ -1,56 +1,323 @@
-<div class="wizard-container p-4">
-  <ng-container [ngSwitch]="step">
+<!-- cotizaciones.component.html -->
+<div class="cotizaciones p-4">
 
-    <!-- Paso 1: Datos personales -->
-    <app-step1-datos-personales
-      *ngSwitchCase="1"
-      [datosCliente]="datosCliente"
-      (guardar)="validarDatosPaso1()"
-    ></app-step1-datos-personales>
+  <!-- ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- LISTADO DE COTIZACIONES -->
+  <!-- ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="mode === 'list'">
 
-
-    <!-- Paso 2: Tipo de seguro -->
-    <app-step2-tipo-seguro
-      *ngSwitchCase="2"
-      [plans]="plans"
-      [selectedPlanId]="tipoSeguro"
-      (selectedPlanIdChange)="tipoSeguro = $event"
-      (prev)="retroceder()"
-      (next)="avanzar()">
-    </app-step2-tipo-seguro>
-
-
-    <!-- Paso 3: Detalles del seguro -->
-    <app-step3-detalles-seguro
-      *ngSwitchCase="3"
-      [tipoSeguro]="tipoSeguro"
-      (prev)="retroceder()"
-      (next)="avanzar()">
-    </app-step3-detalles-seguro>
-
-
-    <app-step4-comparar-opciones
-      *ngSwitchCase="4"
-      [planBaseId]="tipoSeguro"
-      (prev)="retroceder()"
-      (next)="recibirOpcionSeleccionada($event)"
-    ></app-step4-comparar-opciones>
-
-    <!-- Paso 5: Resumen de la cotización -->
-    <app-step5-resumen-cotizacion
-      *ngSwitchCase="5"
-      [cliente]="datosCliente"
-      [planBase]="planBaseSeleccionado"
-      [planOption]="selectedPlanOption"
-      (prev)="retroceder()">
-    </app-step5-resumen-cotizacion>
-
-    <div *ngIf="step === 5" class="text-end mt-4">
-      <button class="btn btn-success" (click)="finalizarCotizacion()">
-        Enviar Cotización
-      </button>
+    <!-- Header con título y botón -->
+    <div class="page-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="m-0">Cotizaciones</h2>
+        <button class="btn btn-primary" (click)="irCrear()">
+          <i class="bi bi-plus-circle me-1"></i>
+          Nueva
+        </button>
+      </div>
     </div>
 
+    <!-- Loading spinner -->
+    <div *ngIf="loadingList" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+
+    <!-- Tabla de cotizaciones -->
+    <div *ngIf="!loadingList" class="table-responsive">
+      <table class="list-table table table-hover align-middle">
+        <thead class="table-light">
+        <tr>
+          <th scope="col">#ID</th>
+          <th scope="col">Cliente</th>
+          <th scope="col">Plan base</th>
+          <th scope="col">Monto</th>
+          <th scope="col">Fecha</th>
+          <th scope="col" class="text-end">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let q of quotations; trackBy: trackQuotation">
+          <td data-label="#ID">
+            <span class="fw-semibold">{{ q.id }}</span>
+          </td>
+          <td data-label="Cliente">
+            <div>
+              <div class="fw-medium">{{ q.client?.first_name }} {{ q.client?.last_name }}</div>
+              <small class="text-muted">{{ q.client?.email }}</small>
+            </div>
+          </td>
+          <td data-label="Plan base">
+            <span class="badge bg-light text-dark">{{ q.plan?.name || '—' }}</span>
+          </td>
+          <td data-label="Monto">
+              <span class="fw-semibold text-success">
+                {{ q.quote_amount | currency:'USD':'symbol':'1.0-2' }}
+              </span>
+          </td>
+          <td data-label="Fecha">
+            <span class="text-muted">{{ q.created_at | date:'mediumDate' }}</span>
+          </td>
+          <td data-label="Acciones" class="text-end">
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="editar(q)"
+                      title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button type="button"
+                      class="btn btn-outline-danger"
+                      (click)="eliminar(q)"
+                      title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mensaje cuando no hay cotizaciones -->
+    <div *ngIf="!loadingList && quotations.length === 0" class="empty-state">
+      <i class="bi bi-clipboard-x"></i>
+      <h5>No hay cotizaciones disponibles</h5>
+      <p>Comienza creando una nueva cotización</p>
+    </div>
 
   </ng-container>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- WIZARD DE COTIZACIÓN -->
+  <!-- ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="mode === 'wizard'">
+
+    <!-- Indicador de progreso -->
+    <div class="wizard-progress">
+      <div class="progress" style="height: 8px;">
+        <div class="progress-bar"
+             role="progressbar"
+             [style.width.%]="(step / 5) * 100"
+             [attr.aria-valuenow]="step"
+             aria-valuemin="0"
+             aria-valuemax="5">
+        </div>
+      </div>
+      <div class="step-info d-flex justify-content-between mt-2">
+        <small class="text-muted">Paso {{ step }} de 5</small>
+        <small class="text-muted">{{ getStepTitle(step) }}</small>
+      </div>
+    </div>
+
+    <!-- Contenedor principal del wizard -->
+    <div class="wizard-container">
+      <ng-container [ngSwitch]="step">
+
+        <!-- Paso 1: Datos personales -->
+        <app-step1-datos-personales
+          *ngSwitchCase="1"
+          [datosCliente]="datosCliente"
+          (guardar)="validarDatosPaso1()">
+        </app-step1-datos-personales>
+
+        <!-- Paso 2: Tipo de seguro -->
+        <app-step2-tipo-seguro
+          *ngSwitchCase="2"
+          [plans]="plans"
+          [selectedPlanId]="tipoSeguro"
+          (selectedPlanIdChange)="tipoSeguro = $event"
+          (prev)="retroceder()"
+          (next)="avanzar()">
+        </app-step2-tipo-seguro>
+
+        <!-- Paso 3: Detalles del seguro -->
+        <app-step3-detalles-seguro
+          *ngSwitchCase="3"
+          [tipoSeguro]="tipoSeguro"
+          (prev)="retroceder()"
+          (next)="avanzar()">
+        </app-step3-detalles-seguro>
+
+        <!-- Paso 4: Comparar opciones -->
+        <app-step4-comparar-opciones
+          *ngSwitchCase="4"
+          [planBaseId]="tipoSeguro"
+          (prev)="retroceder()"
+          (next)="recibirOpcionSeleccionada($event)">
+        </app-step4-comparar-opciones>
+
+        <!-- Paso 5: Resumen de cotización -->
+        <app-step5-resumen-cotizacion
+          *ngSwitchCase="5"
+          [cliente]="datosCliente"
+          [planBase]="planBaseSeleccionado"
+          [planOption]="selectedPlanOption"
+          (prev)="retroceder()">
+        </app-step5-resumen-cotizacion>
+
+      </ng-container>
+
+      <!-- Botón final de envío -->
+      <div *ngIf="step === 5" class="text-end mt-4">
+        <button type="button"
+                class="btn btn-success btn-lg"
+                (click)="finalizarCotizacion()"
+                [disabled]="isProcessing">
+          <i class="bi bi-send me-1"></i>
+          {{ isProcessing ? 'Procesando...' : 'Enviar Cotización' }}
+        </button>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+  <!-- ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
+  <!-- EDICIÓN DE COTIZACIÓN -->
+  <!-- ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
+  <ng-container *ngIf="mode === 'edit'">
+
+    <!-- Header con navegación -->
+    <div class="edit-header">
+      <div class="d-flex align-items-center">
+        <button type="button"
+                class="btn btn-outline-secondary me-3"
+                (click)="router.navigate(['/cotizaciones'])">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <h2 class="m-0">Editar cotización #{{ editingId }}</h2>
+      </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="editLoading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando datos...</span>
+      </div>
+    </div>
+
+    <!-- Formulario de edición -->
+    <div *ngIf="!editLoading" class="edit-form">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+          <form class="card shadow-sm"
+                (ngSubmit)="guardarEdicion()"
+                #editForm="ngForm">
+
+            <div class="card-header bg-light">
+              <h5 class="card-title mb-0">Información de la cotización</h5>
+            </div>
+
+            <div class="card-body">
+
+              <!-- Información del cliente -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Cliente</label>
+                <div class="client-info">
+                  <div class="fw-medium">
+                    {{ selectedClient?.first_name }} {{ selectedClient?.last_name }}
+                  </div>
+                  <small class="text-muted">
+                    <i class="bi bi-envelope me-1"></i>
+                    {{ selectedClient?.email }}
+                  </small>
+                </div>
+              </div>
+
+              <!-- Plan base (solo lectura) -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Plan base</label>
+                <div class="plan-info">
+                  <span class="badge bg-primary">{{ getPlanName(editData.plan_id) }}</span>
+                </div>
+              </div>
+
+              <!-- Opción de plan -->
+              <div class="mb-4">
+                <label for="planOption" class="form-label fw-semibold">
+                  Opción de plan
+                </label>
+                <select id="planOption"
+                        class="form-select"
+                        [(ngModel)]="editData.plan_option_id"
+                        name="planOption">
+                  <option [ngValue]="null">— Sin opción específica —</option>
+                  <option *ngFor="let option of planOptions"
+                          [ngValue]="option.id">
+                    {{ option.name }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Monto -->
+              <div class="mb-4">
+                <label for="amount" class="form-label fw-semibold">
+                  Monto de cotización
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number"
+                         id="amount"
+                         class="form-control"
+                         required
+                         min="0"
+                         step="0.01"
+                         [(ngModel)]="editData.quote_amount"
+                         name="amount"
+                         placeholder="0.00">
+                  <span class="input-group-text">USD</span>
+                </div>
+              </div>
+
+              <!-- Estado -->
+              <div class="mb-4">
+                <label for="status" class="form-label fw-semibold">Estado</label>
+                <select id="status"
+                        class="form-select"
+                        required
+                        [(ngModel)]="editData.status"
+                        name="status">
+                  <option value="NEW">
+                    <i class="bi bi-circle"></i> Nuevo
+                  </option>
+                  <option value="ACCEPTED">
+                    <i class="bi bi-check-circle"></i> Aceptado
+                  </option>
+                  <option value="REJECTED">
+                    <i class="bi bi-x-circle"></i> Rechazado
+                  </option>
+                  <option value="EXPIRED">
+                    <i class="bi bi-clock"></i> Expirado
+                  </option>
+                </select>
+              </div>
+
+            </div>
+
+            <div class="card-footer bg-light">
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        (click)="router.navigate(['/cotizaciones'])">
+                  <i class="bi bi-x-lg me-1"></i>
+                  Cancelar
+                </button>
+                <button type="submit"
+                        class="btn btn-primary"
+                        [disabled]="editForm.invalid || isProcessing">
+                  <i class="bi bi-check-lg me-1"></i>
+                  {{ isProcessing ? 'Guardando...' : 'Guardar cambios' }}
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
 </div>
