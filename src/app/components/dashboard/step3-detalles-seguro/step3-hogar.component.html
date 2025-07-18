@@ -1,0 +1,14 @@
+<h2>Detalles de Seguro de Hogar</h2>
+<p>Informacion especifica del seguro</p>
+
+<form (ngSubmit)="siguientePaso()">
+  <input [(ngModel)]="hogarForm().tipoPropiedad" name="tipoPropiedad" placeholder="Tipo de Propiedad">
+  <input [(ngModel)]="hogarForm().direccion" name="direccion" placeholder="Dirección">
+  <input [(ngModel)]="hogarForm().ciudad" name="ciudad" placeholder="Ciudad/Provincia">
+  <input [(ngModel)]="hogarForm().metrosCuadrados" name="metrosCuadrados" placeholder="Metros Cuadrados Construidos">
+  <input [(ngModel)]="hogarForm().pisos" name="pisos" placeholder="Número de Pisos">
+  <input [(ngModel)]="hogarForm().valorContenido" name="valorContenido" placeholder="Valor aproximado del contenido">
+  <input [(ngModel)]="hogarForm().valorPropiedad" name="valorPropiedad" placeholder="Valor aproximado de propiedad">
+
+  <button type="submit">Siguiente</button>
+</form>

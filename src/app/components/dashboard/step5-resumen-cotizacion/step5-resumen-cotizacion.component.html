@@ -1,0 +1,62 @@
+<div class="resumen-wrapper">
+
+  <h2 class="titulo">Resumen de la Cotización</h2>
+
+  <!-- Datos del cliente -->
+  <section class="bloque">
+    <h3 class="bloque-titulo">👤 Datos del Cliente</h3>
+    <ul class="lista">
+      <li><b>Nombre:</b> {{ cliente.nombres }} {{ cliente.apellidos }}</li>
+      <li><b>Email:</b> {{ cliente.correo }}</li>
+      <li><b>Teléfono:</b> {{ cliente.telefono }}</li>
+      <li><b>Ciudad:</b> {{ cliente.ciudad }}</li>
+      <li><b>Ocupación:</b> {{ cliente.ocupacion }}</li>
+      <li><b>Ingresos:</b> {{ cliente.ingresos | currency }}</li>
+    </ul>
+  </section>
+
+  <!-- Plan base -->
+  <section class="bloque" *ngIf="planBase">
+    <h3 class="bloque-titulo">🛡️ Plan Base Seleccionado</h3>
+    <p class="plan-base-nombre">{{ planBase.name }} <small>(Código: {{ planBase.code }})</small></p>
+    <p class="plan-base-desc">{{ planBase.description }}</p>
+  </section>
+
+  <!-- Opción elegida -->
+  <section class="bloque" *ngIf="planOption">
+    <h3 class="bloque-titulo">🎯 Opción de Plan Elegida</h3>
+
+    <div class="card-opcion">
+      <p class="opcion-nombre">{{ planOption.name }}</p>
+      <p class="opcion-desc">{{ planOption.description }}</p>
+
+      <p class="opcion-precio">
+        {{ planOption.price_yearly | currency:'USD':'symbol':'1.2-2' }} / año
+        <span class="precio-mes">
+          ({{ planOption.price_monthly | currency:'USD':'symbol':'1.2-2' }} / mes)
+        </span>
+      </p>
+
+      <div class="grid">
+        <div>
+          <b>Coberturas</b>
+          <ul class="lista verde">
+            <li *ngFor="let c of planOption.coverage">{{ c }}</li>
+          </ul>
+        </div>
+        <div>
+          <b>Beneficios</b>
+          <ul class="lista amarillo">
+            <li *ngFor="let b of planOption.benefits">{{ b }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navegación -->
+  <div class="botonera">
+    <button class="btn bg-gray-500" (click)="volver()">← Anterior</button>
+  </div>
+
+</div>

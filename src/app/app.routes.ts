@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { ClientesComponent } from './components/clientes/clientes.component';
-import { PlanesComponent } from './components/planes/planes.component';
-import { CotizacionesComponent } from './components/cotizaciones/cotizaciones.component';
-import { PolizasComponent } from './components/polizas/polizas.component';
+import { ClientesComponent } from './components/clients/clientes.component';
+import { PlanesComponent } from './components/plans/planes.component';
+import { CotizacionesComponent } from './components/quotations/cotizaciones.component';
+import { PolizasComponent } from './components/policies/polizas.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 export const routes: Routes = [

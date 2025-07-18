@@ -1,0 +1,56 @@
+<div class="wizard-container p-4">
+  <ng-container [ngSwitch]="step">
+
+    <!-- Paso 1: Datos personales -->
+    <app-step1-datos-personales
+      *ngSwitchCase="1"
+      [datosCliente]="datosCliente"
+      (guardar)="validarDatosPaso1()"
+    ></app-step1-datos-personales>
+
+
+    <!-- Paso 2: Tipo de seguro -->
+    <app-step2-tipo-seguro
+      *ngSwitchCase="2"
+      [plans]="plans"
+      [selectedPlanId]="tipoSeguro"
+      (selectedPlanIdChange)="tipoSeguro = $event"
+      (prev)="retroceder()"
+      (next)="avanzar()">
+    </app-step2-tipo-seguro>
+
+
+    <!-- Paso 3: Detalles del seguro -->
+    <app-step3-detalles-seguro
+      *ngSwitchCase="3"
+      [tipoSeguro]="tipoSeguro"
+      (prev)="retroceder()"
+      (next)="avanzar()">
+    </app-step3-detalles-seguro>
+
+
+    <app-step4-comparar-opciones
+      *ngSwitchCase="4"
+      [planBaseId]="tipoSeguro"
+      (prev)="retroceder()"
+      (next)="recibirOpcionSeleccionada($event)"
+    ></app-step4-comparar-opciones>
+
+    <!-- Paso 5: Resumen de la cotización -->
+    <app-step5-resumen-cotizacion
+      *ngSwitchCase="5"
+      [cliente]="datosCliente"
+      [planBase]="planBaseSeleccionado"
+      [planOption]="selectedPlanOption"
+      (prev)="retroceder()">
+    </app-step5-resumen-cotizacion>
+
+    <div *ngIf="step === 5" class="text-end mt-4">
+      <button class="btn btn-success" (click)="finalizarCotizacion()">
+        Enviar Cotización
+      </button>
+    </div>
+
+
+  </ng-container>
+</div>

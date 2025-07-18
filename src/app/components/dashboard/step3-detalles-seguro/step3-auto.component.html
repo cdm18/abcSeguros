@@ -1,0 +1,17 @@
+<h2>Detalles de Seguro de Auto</h2>
+<p>Informacion especifica del seguro</p>
+
+<form (ngSubmit)="siguientePaso()">
+  <input [(ngModel)]="autoForm().tipoVehiculo" name="tipoVehiculo" placeholder="Tipo de Vehiculo">
+  <input [(ngModel)]="autoForm().matricula" name="matricula" placeholder="Matricula">
+  <input [(ngModel)]="autoForm().anioVehiculo" name="anioVehiculo" placeholder="Año del Vehiculo">
+  <input [(ngModel)]="autoForm().marcaVehiculo" name="marcaVehiculo" placeholder="Marca del Vehiculo">
+  <input [(ngModel)]="autoForm().modeloVehiculo" name="modeloVehiculo" placeholder="Modelo del Vehiculo">
+  <input [(ngModel)]="autoForm().tipoCombustible" name="tipoCombustible" placeholder="Tipo de Combustible">
+  <input [(ngModel)]="autoForm().cobertura" name="cobertura" placeholder="Tipo de cobertura deseada">
+
+  <label><input type="checkbox" [(ngModel)]="autoForm().asistenciaVial" name="asistenciaVial"> Asistencia Vial</label>
+  <label><input type="checkbox" [(ngModel)]="autoForm().vehiculoSustituto" name="vehiculoSustituto"> Vehículo Sustituto</label>
+
+  <button type="submit">Siguiente</button>
+</form>

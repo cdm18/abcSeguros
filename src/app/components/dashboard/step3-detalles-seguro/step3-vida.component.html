@@ -1,0 +1,18 @@
+<h2>Detalles de Seguro de Vida</h2>
+<p>Informacion especifica del seguro</p>
+
+<form (ngSubmit)="siguientePaso()">
+  <input [(ngModel)]="vidaForm().genero" name="genero" placeholder="Género">
+  <input [(ngModel)]="vidaForm().estadoCivil" name="estadoCivil" placeholder="Estado Civil">
+  <input [(ngModel)]="vidaForm().profesion" name="profesion" placeholder="Profesión o actividad principal">
+  <input [(ngModel)]="vidaForm().enfermedades" name="enfermedades" placeholder="Historial de enfermedades relevantes">
+
+  <label><input type="checkbox" [(ngModel)]="vidaForm().fuma" name="fuma"> Fuma</label>
+  <label><input type="checkbox" [(ngModel)]="vidaForm().alcohol" name="alcohol"> Consume alcohol</label>
+  <label><input type="checkbox" [(ngModel)]="vidaForm().deporte" name="deporte"> Deporte extremo</label>
+  <label><input type="checkbox" [(ngModel)]="vidaForm().discapacidad" name="discapacidad"> Discapacidad</label>
+  <label><input type="checkbox" [(ngModel)]="vidaForm().enfermedadesFamiliares" name="enfermedadesFamiliares"> Enfermedades en familia</label>
+  <label><input type="checkbox" [(ngModel)]="vidaForm().hospitalizaciones" name="hospitalizaciones"> Hospitalizado últimos 5 años</label>
+
+  <button type="submit">Siguiente</button>
+</form>
