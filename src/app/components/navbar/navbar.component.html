@@ -1,22 +1,131 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark" data-aos="fade-down">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/">abcSeguros</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#mainNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<!-- WRAPPER (sidebar + overlay) -->
+<div class="sidebar-wrapper" [class.sidebar-expanded]="!isCollapsed()">
 
-    <div id="mainNav" class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a routerLink="/clientes" class="nav-link">Clientes</a></li>
-        <li class="nav-item"><a routerLink="/planes" class="nav-link">Planes</a></li>
-        <li class="nav-item"><a routerLink="/cotizaciones" class="nav-link">Cotizaciones</a></li>
-        <li class="nav-item"><a routerLink="/polizas" class="nav-link">Pólizas</a></li>
-        <li class="nav-item"><a routerLink="/dashboard" class="nav-link">Dashboard</a></li>
+  <!-- Overlay (solo móvil) -->
+  <div class="sidebar-overlay"
+       [class.active]="!isCollapsed()"
+       (click)="toggleSidebar()"></div>
+
+  <!-- ========== SIDEBAR ========== -->
+  <nav class="sidebar d-flex flex-column"
+       [class.expanded]="!isCollapsed()"
+       [attr.aria-expanded]="!isCollapsed()">
+
+    <!-- ==== BRAND ==== -->
+    <header class="sidebar-header">
+      <button class="btn p-0 border-0 bg-transparent brand-container"
+              type="button"
+              (click)="navigateTo('/dashboard')">
+        <div class="brand-logo me-2">
+          <!-- Usa tu SVG externo -->
+          <img src="assets/logo/logo.png"
+               width="70"
+               height="60"
+               alt="logo"
+               class="logo-icon">
+        </div>
+
+        <div class="brand-text" [class.visible]="!isCollapsed()">
+          <span class="brand-suffix lh-1">seguros</span>
+        </div>
+      </button>
+
+    </header>
+
+    <!-- ==== NAVIGATION ==== -->
+    <section class="sidebar-menu flex-grow-1 overflow-auto">
+      <ul class="nav-list list-unstyled m-0">
+
+        <li class="nav-item" [class.active]="isActive('/dashboard')">
+          <a routerLink="/dashboard"
+             class="nav-link"
+             (click)="onNavClick()">
+            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+            <span class="nav-text" [class.visible]="!isCollapsed()">Dashboard</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActive('/clientes')">
+          <a routerLink="/clientes"
+             class="nav-link"
+             (click)="onNavClick()">
+            <span class="nav-icon"><i class="fas fa-users"></i></span>
+            <span class="nav-text" [class.visible]="!isCollapsed()">Clientes</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActive('/planes')">
+          <a routerLink="/planes"
+             class="nav-link"
+             (click)="onNavClick()">
+            <span class="nav-icon"><i class="fas fa-list-alt"></i></span>
+            <span class="nav-text" [class.visible]="!isCollapsed()">Planes</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActive('/cotizaciones')">
+          <a routerLink="/cotizaciones"
+             class="nav-link"
+             (click)="onNavClick()">
+            <span class="nav-icon"><i class="fas fa-calculator"></i></span>
+            <span class="nav-text" [class.visible]="!isCollapsed()">Cotizaciones</span>
+          </a>
+        </li>
+
+        <li class="nav-item" [class.active]="isActive('/polizas')">
+          <a routerLink="/polizas"
+             class="nav-link"
+             (click)="onNavClick()">
+            <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+            <span class="nav-text" [class.visible]="!isCollapsed()">Pólizas</span>
+          </a>
+        </li>
+
       </ul>
-    </div>
-  </div>
-</nav>
+    </section>
+
+    <!-- ==== USER FOOTER ==== -->
+    <footer class="sidebar-footer mt-auto">
+      <div class="user-profile" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <img class="avatar-img"
+               [src]="displayAvatar()"
+               [alt]="displayName() + ' avatar'">
+          <span class="status-indicator"></span>
+        </div>
+
+        <div class="user-info" [class.visible]="!isCollapsed()">
+          <span class="user-name">{{ displayName() }}</span>
+          <br>
+          <span class="user-role text-muted small">Usuario</span>
+        </div>
+
+        <span class="user-menu-toggle" [class.visible]="!isCollapsed()">
+          <i class="fas fa-chevron-up"
+             [class.rotated]="showUserMenu()"></i>
+        </span>
+      </div>
+
+      <!-- dropdown -->
+      <div class="user-menu" [class.show]="showUserMenu() && !isCollapsed()">
+        <a class="menu-item" role="button" (click)="$event.preventDefault()">
+          <i class="fas fa-user"></i><span>Mi Perfil</span>
+        </a>
+        <a class="menu-item" role="button" (click)="$event.preventDefault()">
+          <i class="fas fa-cog"></i><span>Configuración</span>
+        </a>
+        <div class="menu-divider"></div>
+        <a class="menu-item logout" role="button" (click)="logOut($event)">
+          <i class="fas fa-sign-out-alt"></i><span>Salir</span>
+        </a>
+      </div>
+    </footer>
+  </nav>
+</div>
+
+<!-- HAMBURGER (solo móvil) -->
+<button class="mobile-toggle d-md-none" type="button" (click)="toggleSidebar()">
+  <span class="hamburger" [class.active]="!isCollapsed()">
+    <span></span><span></span><span></span>
+  </span>
+</button>

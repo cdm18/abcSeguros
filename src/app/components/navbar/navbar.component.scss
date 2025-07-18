@@ -1,0 +1,418 @@
+/*  ===========================================================================
+    VARIABLES
+    ========================================================================= */
+$primary-color          : #6366f1;
+$secondary-color        : #8b5cf6;
+$success-color          : #10b981;
+$danger-color           : #ef4444;
+
+$white                  : #ffffff;
+$gray-50                : #f8fafc;
+$gray-100               : #f1f5f9;
+$gray-200               : #e2e8f0;
+$gray-300               : #cbd5e1;
+$gray-400               : #000000;
+$gray-500               : #64748b;
+$gray-600               : #475569;
+$gray-700               : #727f8a;
+$gray-800               : #1e293b;
+$gray-900               : #0f172a;
+
+$border-color           : $gray-200;
+
+$sidebar-width          : 280px;
+$sidebar-collapsed-width: 70px;
+
+/*  ===========================================================================
+    MIXINS
+    ========================================================================= */
+@mixin transition($prop:all,$dur:0.3s,$ease:ease){
+  transition: $prop $dur $ease;
+}
+@mixin flex-center{
+  display:flex;align-items:center;justify-content:center;
+}
+
+/*  ===========================================================================
+    WRAPPER + OVERLAY
+    ========================================================================= */
+.sidebar-wrapper{
+  position:fixed;inset-block:0;left:0;z-index:1000;
+
+  &.sidebar-expanded .sidebar-overlay{
+    opacity:1;visibility:visible;
+  }
+}
+.sidebar-overlay{
+  position:fixed;inset:0;backdrop-filter:blur(2px);
+  background:rgba(0,0,0,.5);opacity:0;visibility:hidden;z-index:999;
+  @include transition(opacity);
+
+  &.active{opacity:1;visibility:visible;}
+  @media (min-width:768px){display:none;}
+}
+
+/*  ===========================================================================
+    SIDEBAR
+    ========================================================================= */
+.sidebar{
+  position:relative;width:$sidebar-collapsed-width;height:100vh;
+  background:linear-gradient(180deg,$white 0%,$gray-50 100%);
+  border-right:1px solid $border-color;box-shadow:0 0 20px rgba(0,0,0,.05);
+  overflow:hidden;@include transition(width,.3s,cubic-bezier(.4,0,.2,1));
+
+  &.expanded{width:$sidebar-width;}
+
+  @media (max-width:767px){
+    transform:translateX(-100%);width:$sidebar-width;
+    &.expanded{transform:translateX(0);}
+  }
+}
+
+/*  ==== HEADER ==== */
+.sidebar-header{
+  @include flex-center;
+  justify-content: center; // Cambiado de space-between a center
+  padding:1.25rem 1rem;border-bottom:1px solid $border-color;background:$white;
+  position: relative; // Añadido para posicionamiento absoluto del toggle
+
+  .brand-container{
+    display:flex;align-items:center;gap:.75rem;cursor:pointer; // Aumentado gap de .5rem a .75rem
+    justify-content: center; // Añadido para centrar el contenido
+  }
+
+  .logo-icon{@include transition(transform,.25s);}
+
+  .brand-container:hover .logo-icon{transform:scale(1.1);}
+
+  .brand-text{opacity:0;@include transition(opacity);
+    &.visible{opacity:1;}
+
+    .brand-name{
+      font-weight: 800; // Cambiado de 700 a 800 para más peso
+      font-size: 1.625rem; // Aumentado de 1.5rem a 1.625rem
+      color:$primary-color;
+      line-height: 1.1; // Ajustado para mejor spacing
+      letter-spacing: -0.025em; // Añadido para mejor legibilidad
+    }
+    .brand-suffix{
+      font-size: 1rem; // Aumentado de .9rem a 1rem
+      color:$gray-500;
+      font-weight: 500; // Añadido peso
+      letter-spacing: 0.025em; // Añadido spacing
+    }
+  }
+
+  .sidebar-toggle{
+    border:0;background:none;padding:.375rem;border-radius:.5rem;
+    @include transition(background);
+    position: absolute; // Añadido
+    right: 1rem; // Añadido para posicionar a la derecha
+    top: 50%; // Añadido
+    transform: translateY(-50%); // Añadido para centrar verticalmente
+
+    &:hover{background:$gray-100;}
+
+    .toggle-icon{@include transition(transform);
+      &.rotated{transform:rotate(180deg);}
+      i{color:$gray-600;font-size:1rem;}
+    }
+  }
+}
+
+// Mejoras adicionales para modo oscuro
+@media (prefers-color-scheme: dark) {
+  .sidebar .sidebar-header .brand-text .brand-name {
+    color: #f8fafc !important; // Blanco más puro para mejor contraste
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important; // Sutil sombra
+  }
+
+  .sidebar .sidebar-header .brand-text .brand-suffix {
+    color: #cbd5e1 !important; // Mejor contraste que el anterior
+    font-weight: 500 !important; // Consistencia con el peso añadido
+  }
+}
+
+/*  ==== MENU ==== */
+.sidebar-menu{padding:1rem 0;
+  .nav-list{margin:0;padding:0;list-style:none;}
+
+  .nav-item{margin:.25rem 0;position:relative;
+
+    &.active .nav-link{
+      background:linear-gradient(135deg,$primary-color 0%,$secondary-color 100%);
+      color:$white;box-shadow:0 4px 12px rgba(99,102,241,.3);
+      .nav-icon i{color:$white;}
+      .nav-indicator{opacity:1;transform:scaleY(1);}
+    }
+
+    .nav-link{
+      @include flex-center;justify-content:flex-start;
+      gap:.75rem;padding:.75rem 1rem;color:$gray-700;text-decoration:none;
+      border-radius:0 25px 25px 0;margin-right:1rem;position:relative;
+      @include transition();
+
+      &:hover{
+        background:$gray-100;color:$primary-color;transform:translateX(4px);
+        .nav-icon i{color:$primary-color;transform:scale(1.1);}
+      }
+
+      .nav-icon{width:24px;height:24px;@include flex-center;
+        i{font-size:1.125rem;color:$gray-500;@include transition();}
+      }
+
+      .nav-text{font-weight:500;font-size:.9rem;opacity:0;@include transition(opacity);
+        &.visible{opacity:1;}
+      }
+
+      .nav-indicator{
+        position:absolute;right:0;top:50%;transform:translateY(-50%) scaleY(0);
+        width:3px;height:20px;
+        background:linear-gradient(to bottom,$primary-color,$secondary-color);
+        border-radius:2px;opacity:0;@include transition();
+      }
+    }
+  }
+}
+
+/*  ==== FOOTER (USER) ==== */
+.sidebar-footer{padding:1rem;border-top:1px solid $border-color;background:$white;position:relative;
+
+  .user-profile{@include flex-center;gap:.75rem;padding:.75rem;border-radius:.75rem;
+    cursor:pointer;@include transition(background);
+    &:hover{background:$gray-100;}
+  }
+
+  .user-avatar{position:relative;
+    .avatar-img{width:40px;height:40px;border-radius:50%;object-fit:cover;
+      border:2px solid $primary-color;
+    }
+    .status-indicator{position:absolute;bottom:0;right:0;width:12px;height:12px;
+      border-radius:50%;background:$success-color;border:2px solid $white;}
+  }
+
+  .user-info{flex:1;opacity:0;@include transition(opacity);
+    &.visible{opacity:1;}
+    .user-name{font-weight:600;font-size:.9rem;color:$gray-800;}
+    .user-role{font-size:.75rem;color:$gray-500;}
+  }
+
+  .user-menu-toggle{opacity:0;@include transition();
+    &.visible{opacity:1;}
+    i{color:$gray-400;@include transition(transform);
+      &.rotated{transform:rotate(180deg);}
+    }
+  }
+
+  /* dropdown */
+  .user-menu{
+    position:absolute;bottom:100%;left:1rem;right:1rem;
+    background:$white;border:1px solid $border-color;border-radius:.75rem;
+    box-shadow:0 10px 40px rgba(0,0,0,.15);
+    opacity:0;transform:translateY(10px);visibility:hidden;@include transition();
+    &.show{opacity:1;transform:translateY(0);visibility:visible;}
+
+    .menu-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;
+      color:$gray-700;text-decoration:none;@include transition(background);
+      &:hover{background:$gray-100;color:$primary-color;}
+      &.logout{color:$danger-color;&:hover{background:rgba(239,68,68,.1);}}
+      i{width:16px;text-align:center;}
+    }
+    .menu-divider{height:1px;background:$border-color;}
+  }
+}
+
+/*  ==== HAMBURGER (MÓVIL) ==== */
+.mobile-toggle{
+  position:fixed;top:1rem;left:1rem;padding:12px;border:1px solid $border-color;
+  background:$white;border-radius:.75rem;z-index:1002;@include transition();
+  &:hover{background:$gray-100;}
+
+  .hamburger{width:20px;height:16px;position:relative;
+    span{position:absolute;width:100%;height:2px;background:$gray-600;border-radius:1px;
+      @include transition();}
+
+    span:nth-child(1){top:0;}
+    span:nth-child(2){top:7px;}
+    span:nth-child(3){top:14px;}
+
+    &.active{
+      span:nth-child(1){transform:rotate(45deg);top:7px;}
+      span:nth-child(2){opacity:0;}
+      span:nth-child(3){transform:rotate(-45deg);top:7px;}
+    }
+  }
+  @media (min-width:768px){display:none;}
+}
+
+/*  ==== DARK-MODE (opcional) ==== */
+/*  ==== DARK-MODE (colores mejorados y atractivos) ==== */
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    background: linear-gradient(180deg, #1a1d29 0%, #151821 100%) !important;
+    border-color: #2d3748 !important;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .sidebar .sidebar-header,
+  .sidebar .sidebar-footer {
+    background: #1a1d29 !important;
+    border-color: #2d3748 !important;
+  }
+
+  // Texto del brand con colores atractivos
+  .sidebar .sidebar-header .brand-text .brand-name {
+    color: #e2e8f0 !important;
+  }
+
+  .sidebar .sidebar-header .brand-text .brand-suffix {
+    color: #94a3b8 !important;
+  }
+
+  // Enlaces de navegación con colores modernos
+  .sidebar .sidebar-menu .nav-link {
+    color: #cbd5e1 !important;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+      color: #a78bfa !important;
+      transform: translateX(6px) !important;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+    }
+  }
+
+  .sidebar .sidebar-menu .nav-link .nav-icon i {
+    color: #94a3b8 !important;
+  }
+
+  .sidebar .sidebar-menu .nav-link:hover .nav-icon i {
+    color: #a78bfa !important;
+    transform: scale(1.1) !important;
+  }
+
+  // Item activo con gradiente mejorado
+  .sidebar .sidebar-menu .nav-item.active .nav-link {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+  }
+
+  .sidebar .sidebar-menu .nav-item.active .nav-link .nav-icon i {
+    color: #ffffff !important;
+  }
+
+  // Información del usuario con colores diferenciados
+  .sidebar .sidebar-footer .user-profile .user-info .user-name {
+    color: #f1f5f9 !important; // Blanco suave para el nombre
+    font-weight: 600 !important;
+  }
+
+  .sidebar .sidebar-footer .user-profile .user-info .user-role {
+    color: #94a3b8 !important; // Gris azulado para el teléfono
+  }
+
+  // Ícono chevron-up del menú de usuario
+  .sidebar .sidebar-footer .user-profile .user-menu-toggle i {
+    color: #94a3b8 !important; // Mismo color que el teléfono
+  }
+
+  .sidebar .sidebar-footer .user-profile:hover .user-menu-toggle i {
+    color: #a78bfa !important; // Color violeta en hover
+    transform: scale(1.1) !important;
+  }
+
+  // Perfil de usuario hover con efecto atractivo
+  .sidebar .sidebar-footer .user-profile:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  // Avatar con mejor contraste
+  .sidebar .sidebar-footer .user-profile .user-avatar .avatar-img {
+    border-color: #6366f1 !important;
+  }
+
+  .sidebar .sidebar-footer .user-profile .user-avatar .status-indicator {
+    background: #10b981 !important;
+    border-color: #1a1d29 !important;
+  }
+
+  // Menú desplegable del usuario
+  .sidebar .sidebar-footer .user-menu {
+    background: linear-gradient(135deg, #1e293b 0%, #1a1d29 100%) !important;
+    border-color: #2d3748 !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .sidebar .sidebar-footer .user-menu .menu-item {
+    color: #cbd5e1 !important;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+      color: #a78bfa !important;
+    }
+
+    &.logout {
+      color: #f87171 !important;
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(248, 113, 113, 0.1) 100%) !important;
+        color: #fca5a5 !important;
+      }
+    }
+  }
+
+  .sidebar .sidebar-footer .user-menu .menu-divider {
+    background: linear-gradient(90deg, transparent 0%, #2d3748 50%, transparent 100%) !important;
+  }
+
+  // Botón toggle con colores modernos
+  .sidebar .sidebar-header .sidebar-toggle {
+    &:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+      transform: scale(1.05) !important;
+    }
+  }
+
+  .sidebar .sidebar-header .sidebar-toggle .toggle-icon i {
+    color: #94a3b8 !important;
+  }
+
+  .sidebar .sidebar-header .sidebar-toggle:hover .toggle-icon i {
+    color: #a78bfa !important;
+  }
+
+  // Hamburger móvil con colores atractivos
+  .mobile-toggle {
+    background: linear-gradient(135deg, #1e293b 0%, #1a1d29 100%) !important;
+    border-color: #2d3748 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+      transform: scale(1.05) !important;
+    }
+  }
+
+  .mobile-toggle .hamburger span {
+    background: #cbd5e1 !important;
+  }
+
+  // Overlay con gradiente
+  .sidebar-overlay {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
+    backdrop-filter: blur(4px) !important;
+  }
+}
+/*  ==== ANIMATIONS (entrada + nitidez) ==== */
+@keyframes slideIn{from{transform:translateX(-100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.sidebar{animation:slideIn .4s cubic-bezier(.4,0,.2,1);}
+
+@keyframes fadeUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.nav-item{animation:fadeUp .3s cubic-bezier(.4,0,.2,1);}
+
+/* A11Y focus */
+.sidebar:focus-within .nav-link:focus{
+  outline:2px solid $primary-color;outline-offset:2px;background:$gray-100;
+}

@@ -1,19 +1,64 @@
-<div class="container p-4" style="max-width: 400px; margin: auto;">
-  <h2 class="text-center mb-4">Iniciar Sesión</h2>
+<div class="login-container">
+  <div class="login-background">
+    <div class="background-shape shape-1"></div>
+    <div class="background-shape shape-2"></div>
+    <div class="background-shape shape-3"></div>
+  </div>
 
-  <form (ngSubmit)="login()">
-    <div class="mb-3">
-      <label for="username" class="form-label">Usuario</label>
-      <input [(ngModel)]="username" name="username" type="text" class="form-control" id="username" required />
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo-container">
+        <img src="assets/logo/logo.png" alt="Logo" class="logo-image">
+      </div>
+      <h1 class="login-title">Bienvenido</h1>
+      <p class="login-subtitle">Inicia sesión en tu cuenta</p>
     </div>
 
-    <div class="mb-3">
-      <label for="password" class="form-label">Contraseña</label>
-      <input [(ngModel)]="password" name="password" type="password" class="form-control" id="password" required />
-    </div>
+    <form class="login-form" (ngSubmit)="login()">
+      <div class="form-group">
+        <label for="username" class="form-label">Usuario</label>
+        <div class="input-container">
+          <i class="input-icon fas fa-user"></i>
+          <input
+            [(ngModel)]="username"
+            name="username"
+            type="text"
+            class="form-input"
+            id="username"
+            placeholder="Ingresa tu usuario"
+            required
+            autocomplete="username"
+          />
+        </div>
+      </div>
 
-    <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+      <div class="form-group">
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="input-container">
+          <i class="input-icon fas fa-lock"></i>
+          <input
+            [(ngModel)]="password"
+            name="password"
+            type="password"
+            class="form-input"
+            id="password"
+            placeholder="Ingresa tu contraseña"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+      </div>
 
-    <button type="submit" class="btn btn-primary w-100">Ingresar</button>
-  </form>
+
+      <div *ngIf="errorMsg" class="error-message">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ errorMsg }}
+      </div>
+
+      <button type="submit" class="login-button" [disabled]="!username || !password">
+        <span class="button-text">Iniciar Sesión</span>
+        <i class="button-icon fas fa-arrow-right"></i>
+      </button>
+    </form>
+  </div>
 </div>

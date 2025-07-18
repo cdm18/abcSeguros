@@ -1,174 +1,369 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, retry } from 'rxjs/operators';
 
-import {Client} from '../models/client.model';
-import {Policy} from '../models/policy.model';
-import {PlanBase} from '../models/plan-base.model';
-import {Company} from '../models/company.model';
-import {Payment} from '../models/payment.model';
-import {Quotation} from '../models/quotation.model';
-import {User} from '../models/user.model';
+import { Client } from '../models/client.model';
+import { Policy } from '../models/policy.model';
+import { PlanBase } from '../models/plan-base.model';
+import { Company } from '../models/company.model';
+import { Payment } from '../models/payment.model';
+import { Quotation } from '../models/quotation.model';
+import { User } from '../models/user.model';
+
+export interface CreateQuotationRequest {
+  client_id: number;
+  plan_id: number;
+  plan_option_id: number | null;
+  quoted_by: number;
+  quote_amount: number;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  success: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:3000/api';
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = 'http://localhost:3000/api';
 
-  constructor(private http: HttpClient) {
+  private readonly httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+  };
+
+  /* -------------- Error Handling -------------- */
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'Error desconocido';
+
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado del cliente
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Error del lado del servidor
+      errorMessage = `Código de error: ${error.status}\nMensaje: ${error.message}`;
+    }
+
+    console.error('ApiService Error:', errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 
-  // Clients
+  /* -------------- Generic CRUD Operations -------------- */
+  private get<T>(endpoint: string): Observable<T> {
+    return this.http.get<T>(`${this.baseUrl}${endpoint}`)
+      .pipe(
+        retry(1),
+        catchError(this.handleError)
+      );
+  }
+
+  private post<T>(endpoint: string, data: any): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, data, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  private put<T>(endpoint: string, data: any): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}${endpoint}`, data, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  private delete<T>(endpoint: string): Observable<T> {
+    return this.http.delete<T>(`${this.baseUrl}${endpoint}`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  /* -------------- Clients -------------- */
   getClients(): Observable<Client[]> {
-    return this.http.get<Client[]>(`${this.baseUrl}/clients`);
+    return this.get<Client[]>('/clients');
   }
 
   getClient(id: number): Observable<Client> {
-    return this.http.get<Client>(`${this.baseUrl}/clients/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de cliente inválido'));
+    }
+    return this.get<Client>(`/clients/${id}`);
   }
 
   createClient(data: Partial<Client>): Observable<Client> {
-    return this.http.post<Client>(`${this.baseUrl}/clients`, data);
+    if (!data) {
+      return throwError(() => new Error('Datos del cliente requeridos'));
+    }
+    return this.post<Client>('/clients', data);
   }
 
   updateClient(id: number, data: Partial<Client>): Observable<Client> {
-    return this.http.put<Client>(`${this.baseUrl}/clients/${id}`, data);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de cliente inválido'));
+    }
+    if (!data) {
+      return throwError(() => new Error('Datos del cliente requeridos'));
+    }
+    return this.put<Client>(`/clients/${id}`, data);
   }
 
   deleteClient(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/clients/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de cliente inválido'));
+    }
+    return this.delete<void>(`/clients/${id}`);
   }
 
-  // Planes
+  /* -------------- Plans -------------- */
   getPlans(): Observable<PlanBase[]> {
-    return this.http.get<PlanBase[]>(`${this.baseUrl}/plans`);
+    return this.get<PlanBase[]>('/plans');
   }
 
   getPlan(id: number): Observable<PlanBase> {
-    return this.http.get<PlanBase>(`${this.baseUrl}/plans/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de plan inválido'));
+    }
+    return this.get<PlanBase>(`/plans/${id}`);
   }
 
   createPlan(data: Partial<PlanBase>): Observable<PlanBase> {
-    return this.http.post<PlanBase>(`${this.baseUrl}/plans`, data);
+    if (!data) {
+      return throwError(() => new Error('Datos del plan requeridos'));
+    }
+    return this.post<PlanBase>('/plans', data);
   }
 
   updatePlan(id: number, data: Partial<PlanBase>): Observable<PlanBase> {
-    return this.http.put<PlanBase>(`${this.baseUrl}/plans/${id}`, data);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de plan inválido'));
+    }
+    if (!data) {
+      return throwError(() => new Error('Datos del plan requeridos'));
+    }
+    return this.put<PlanBase>(`/plans/${id}`, data);
   }
 
   deletePlan(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/plans/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de plan inválido'));
+    }
+    return this.delete<void>(`/plans/${id}`);
   }
 
-  // Pólizas
+  /* -------------- Policies -------------- */
   getPolicies(): Observable<Policy[]> {
-    return this.http.get<Policy[]>(`${this.baseUrl}/policies`);
+    return this.get<Policy[]>('/policies');
   }
 
   getPolicy(id: number): Observable<Policy> {
-    return this.http.get<Policy>(`${this.baseUrl}/policies/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de póliza inválido'));
+    }
+    return this.get<Policy>(`/policies/${id}`);
   }
 
   createPolicy(data: Partial<Policy>): Observable<Policy> {
-    return this.http.post<Policy>(`${this.baseUrl}/policies`, data);
+    if (!data) {
+      return throwError(() => new Error('Datos de la póliza requeridos'));
+    }
+    return this.post<Policy>('/policies', data);
   }
 
   updatePolicy(id: number, data: Partial<Policy>): Observable<Policy> {
-    return this.http.put<Policy>(`${this.baseUrl}/policies/${id}`, data);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de póliza inválido'));
+    }
+    if (!data) {
+      return throwError(() => new Error('Datos de la póliza requeridos'));
+    }
+    return this.put<Policy>(`/policies/${id}`, data);
   }
 
   deletePolicy(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/policies/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de póliza inválido'));
+    }
+    return this.delete<void>(`/policies/${id}`);
   }
 
-  // Usuarios
+  /* -------------- Users (Brokers) -------------- */
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.baseUrl}/users`);
+    return this.get<User[]>('/users');
   }
 
   getUser(id: number): Observable<User> {
-    return this.http.get<User>(`${this.baseUrl}/users/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de usuario inválido'));
+    }
+    return this.get<User>(`/users/${id}`);
   }
 
   createUser(data: Partial<User>): Observable<User> {
-    return this.http.post<User>(`${this.baseUrl}/users`, data);
+    if (!data) {
+      return throwError(() => new Error('Datos del usuario requeridos'));
+    }
+    return this.post<User>('/users', data);
   }
 
   updateUser(id: number, data: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.baseUrl}/users/${id}`, data);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de usuario inválido'));
+    }
+    if (!data) {
+      return throwError(() => new Error('Datos del usuario requeridos'));
+    }
+    return this.put<User>(`/users/${id}`, data);
   }
 
   deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/users/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de usuario inválido'));
+    }
+    return this.delete<void>(`/users/${id}`);
   }
 
-  // Cotizaciones
+  /* -------------- Quotations -------------- */
   getQuotations(): Observable<Quotation[]> {
-    return this.http.get<Quotation[]>(`${this.baseUrl}/quotations`);
+    return this.get<Quotation[]>('/quotations');
   }
 
   getQuotation(id: number): Observable<Quotation> {
-    return this.http.get<Quotation>(`${this.baseUrl}/quotations/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de cotización inválido'));
+    }
+    return this.get<Quotation>(`/quotations/${id}`);
   }
 
-  createQuotation(data: {
-    client_id: number;
-    plan_id: number;
-    plan_option_id: number | null;
-    quoted_by: number;
-    quote_amount: number;
-  }) {
-    return this.http.post<any>(`${this.baseUrl}/quotations`, data);
+  createQuotation(data: CreateQuotationRequest): Observable<Quotation> {
+    if (!data) {
+      return throwError(() => new Error('Datos de la cotización requeridos'));
+    }
+
+    // Validaciones específicas para cotizaciones
+    if (!data.client_id || data.client_id <= 0) {
+      return throwError(() => new Error('ID de cliente inválido'));
+    }
+    if (!data.plan_id || data.plan_id <= 0) {
+      return throwError(() => new Error('ID de plan inválido'));
+    }
+    if (!data.quoted_by || data.quoted_by <= 0) {
+      return throwError(() => new Error('ID del broker inválido'));
+    }
+    if (!data.quote_amount || data.quote_amount <= 0) {
+      return throwError(() => new Error('Monto de cotización inválido'));
+    }
+
+    return this.post<Quotation>('/quotations', data);
   }
 
   updateQuotation(id: number, data: Partial<Quotation>): Observable<Quotation> {
-    return this.http.put<Quotation>(`${this.baseUrl}/quotations/${id}`, data);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de cotización inválido'));
+    }
+    if (!data) {
+      return throwError(() => new Error('Datos de la cotización requeridos'));
+    }
+    return this.put<Quotation>(`/quotations/${id}`, data);
   }
 
   deleteQuotation(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/quotations/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de cotización inválido'));
+    }
+    return this.delete<void>(`/quotations/${id}`);
   }
 
-  // Pagos
+  /* -------------- Payments -------------- */
   getPayments(): Observable<Payment[]> {
-    return this.http.get<Payment[]>(`${this.baseUrl}/payments`);
+    return this.get<Payment[]>('/payments');
   }
 
   getPayment(id: number): Observable<Payment> {
-    return this.http.get<Payment>(`${this.baseUrl}/payments/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de pago inválido'));
+    }
+    return this.get<Payment>(`/payments/${id}`);
   }
 
   createPayment(data: Partial<Payment>): Observable<Payment> {
-    return this.http.post<Payment>(`${this.baseUrl}/payments`, data);
+    if (!data) {
+      return throwError(() => new Error('Datos del pago requeridos'));
+    }
+    return this.post<Payment>('/payments', data);
   }
 
   updatePayment(id: number, data: Partial<Payment>): Observable<Payment> {
-    return this.http.put<Payment>(`${this.baseUrl}/payments/${id}`, data);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de pago inválido'));
+    }
+    if (!data) {
+      return throwError(() => new Error('Datos del pago requeridos'));
+    }
+    return this.put<Payment>(`/payments/${id}`, data);
   }
 
   deletePayment(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/payments/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de pago inválido'));
+    }
+    return this.delete<void>(`/payments/${id}`);
   }
 
-  // Compañías
+  /* -------------- Companies -------------- */
   getCompanies(): Observable<Company[]> {
-    return this.http.get<Company[]>(`${this.baseUrl}/companies`);
+    return this.get<Company[]>('/companies');
   }
 
   getCompany(id: number): Observable<Company> {
-    return this.http.get<Company>(`${this.baseUrl}/companies/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de compañía inválido'));
+    }
+    return this.get<Company>(`/companies/${id}`);
   }
 
   createCompany(data: Partial<Company>): Observable<Company> {
-    return this.http.post<Company>(`${this.baseUrl}/companies`, data);
+    if (!data) {
+      return throwError(() => new Error('Datos de la compañía requeridos'));
+    }
+    return this.post<Company>('/companies', data);
   }
 
   updateCompany(id: number, data: Partial<Company>): Observable<Company> {
-    return this.http.put<Company>(`${this.baseUrl}/companies/${id}`, data);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de compañía inválido'));
+    }
+    if (!data) {
+      return throwError(() => new Error('Datos de la compañía requeridos'));
+    }
+    return this.put<Company>(`/companies/${id}`, data);
   }
 
   deleteCompany(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/companies/${id}`);
+    if (!id || id <= 0) {
+      return throwError(() => new Error('ID de compañía inválido'));
+    }
+    return this.delete<void>(`/companies/${id}`);
+  }
+
+  /* -------------- Utility Methods -------------- */
+
+  /**
+   * Verifica si el servicio está disponible
+   */
+  healthCheck(): Observable<any> {
+    return this.get('/health');
+  }
+
+  /**
+   * Obtiene estadísticas generales del dashboard
+   */
+  getDashboardStats(): Observable<any> {
+    return this.get('/dashboard/stats');
   }
 }
