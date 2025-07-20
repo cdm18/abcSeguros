@@ -1,3 +1,4 @@
+<!-- step3-detalles-seguro.component.html -->
 <div class="container mt-4">
   <h2 class="mb-3">Detalles del Seguro Seleccionado</h2>
 
@@ -6,29 +7,31 @@
 
     <app-step3-auto
       *ngSwitchCase="2"
-      (continuar)="avanzarConDatos($event)">
+      (continuar)="next.emit($event)"
+      (prev)="prev.emit()">
     </app-step3-auto>
 
     <app-step3-hogar
       *ngSwitchCase="4"
-      (continuar)="avanzarConDatos($event)">
+      (continuar)="next.emit($event)"
+      (prev)="prev.emit()">
     </app-step3-hogar>
 
     <app-step3-viaje
       *ngSwitchCase="1"
-      (continuar)="avanzarConDatos($event)">
+      (continuar)="next.emit($event)"
+      (prev)="prev.emit()">
     </app-step3-viaje>
 
     <app-step3-vida
       *ngSwitchCase="3"
-      (continuar)="avanzarConDatos($event)">
+      (continuar)="next.emit($event)"
+      (prev)="prev.emit()">
     </app-step3-vida>
 
-    <div *ngSwitchDefault>
-      <p class="text-danger">⚠️ Por favor seleccione un tipo de seguro válido.</p>
-    </div>
+    <p *ngSwitchDefault class="text-danger">
+      ⚠️ Por favor seleccione un tipo de seguro válido.
+    </p>
 
   </ng-container>
-
-  <button class="btn btn-secondary mt-3" (click)="retroceder()">← Anterior</button>
 </div>

@@ -11,7 +11,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { switchMap, forkJoin, map, catchError, of, finalize } from 'rxjs';
 
 // Services
-import { ApiService } from '../../services/api.service';
+import { ApiService, CreateQuotationRequest} from '../../services/api.service';
 import { PlanBaseService } from '../../services/plan-base.service';
 
 // Models
@@ -21,11 +21,11 @@ import { PlanOption } from '../../models/plan-option.model';
 import { Quotation, QuotationStatus } from '../../models/quotation.model';
 
 // Components
-import { Step1DatosPersonalesComponent } from '../dashboard/step1-datos-personales/step1-datos-personales.component';
-import { Step2TipoSeguroComponent } from '../dashboard/step2-tipo-seguro/step2-tipo-seguro.component';
-import { Step3DetallesSeguroComponent } from '../dashboard/step3-detalles-seguro/step3-detalles-seguro.component';
-import { Step4CompararOpcionesComponent } from '../dashboard/step4-comparar-opciones/step4-comparar-opciones.component';
-import { Step5ResumenCotizacionComponent } from '../dashboard/step5-resumen-cotizacion/step5-resumen-cotizacion.component';
+import { Step1DatosPersonalesComponent } from './step1-datos-personales/step1-datos-personales.component';
+import { Step2TipoSeguroComponent } from './step2-tipo-seguro/step2-tipo-seguro.component';
+import { Step3DetallesSeguroComponent } from './step3-detalles-seguro/step3-detalles-seguro.component';
+import { Step4CompararOpcionesComponent } from './step4-comparar-opciones/step4-comparar-opciones.component';
+import { Step5ResumenCotizacionComponent } from './step5-resumen-cotizacion/step5-resumen-cotizacion.component';
 
 // Types
 type Mode = 'list' | 'wizard' | 'edit';
@@ -358,26 +358,62 @@ export class CotizacionesComponent implements OnInit {
   }
 
   finalizarCotizacion(): void {
-    if (this.isProcessing) return;
+
+    if (this.isProcessing) { return; }
+
+    /* Validaciones mínimas */
+    if (!this.planBaseSeleccionado) {
+      alert('Debes seleccionar un tipo de seguro.'); return;
+    }
+    if (!this.selectedPlanOption) {
+      alert('Debes elegir una opción de plan.'); return;
+    }
+
+    /* 1. Creamos al cliente (versión simplificada) */
+    const clientePayload = {
+      first_name: this.datosCliente.nombres.trim(),
+      last_name : this.datosCliente.apellidos.trim(),
+      email     : this.datosCliente.correo.trim(),
+      phone     : this.datosCliente.telefono.trim()
+    };
 
     this.isProcessing = true;
 
-    // Aquí iría la lógica para finalizar la cotización
-    // Por ejemplo, enviar los datos al servidor
-    console.log('Finalizando cotización:', {
-      cliente: this.datosCliente,
-      plan: this.planBaseSeleccionado,
-      option: this.selectedPlanOption
+    this.api.createClientSimplified(clientePayload).pipe(
+
+      /* 2. Con el ID del cliente creamos la cotización */
+      switchMap(cli => {
+
+        if (!cli.id) {
+          throw new Error('El servicio devolvió un id de cliente vacío');
+        }
+
+        const cotPayload: CreateQuotationRequest = {
+          client_id      : cli.id,              // ← ya es 100 % number
+          plan_id        : this.planBaseSeleccionado!.id,
+          plan_option_id : this.selectedPlanOption?.id ?? null,
+          quoted_by      : 1,                   // TODO: ID del usuario autenticado
+          quote_amount   : +this.selectedPlanOption!.price_yearly
+        };
+
+        return this.api.createQuotation(cotPayload);
+      }),
+
+      finalize(() => this.isProcessing = false)
+
+    ).subscribe({
+
+      next: () => {
+        alert('🎉 Cotización creada satisfactoriamente');
+        this.router.navigate(['/cotizaciones']);
+      },
+
+      error: err => {
+        console.error('Error creando cotización', err);
+        alert('Error al crear la cotización: ' + err.message);
+      }
     });
-
-    // Simular procesamiento
-    setTimeout(() => {
-      this.isProcessing = false;
-      alert('Cotización enviada exitosamente');
-      this.router.navigate(['/cotizaciones']);
-    }, 2000);
   }
-
   getStepTitle(step: number): string {
     const titles = {
       1: 'Datos Personales',

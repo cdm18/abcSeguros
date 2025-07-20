@@ -1,1 +1,170 @@
-<p>planes works!</p>
+<div class="planes">
+
+  <!-- KPI CARDS -->
+  <div class="row g-3 mb-4" *ngIf="!loading">
+    <div class="col-6 col-lg-3" *ngFor="let card of [
+          {icon:'bi-layer-backward',title:'Planes',value:kpi.total,bg:'primary'},
+          {icon:'bi-buildings',     title:'Compañías',value:kpi.companies,bg:'info'},
+          {icon:'bi-alarm',         title:'Próximos pagos',value:kpi.upcoming,bg:'success'},
+          {icon:'bi-exclamation',   title:'Pagos vencidos',value:kpi.overdue,bg:'danger'}
+        ]">
+      <div class="card shadow-sm h-100 kpi-card border-0">
+        <div class="card-body d-flex align-items-center gap-3">
+          <i class="bi {{card.icon}} fs-3 text-{{card.bg}}"></i>
+          <div>
+            <h4 class="mb-0">{{card.value}}</h4>
+            <small class="text-muted">{{card.title}}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <form class="row gy-2 gx-3 align-items-end mb-3" *ngIf="!loading">
+    <div class="col-sm-4 col-md-3">
+      <label class="form-label fw-semibold">Compañía</label>
+      <select class="form-select" [(ngModel)]="filtroCompany" name="fComp">
+        <option [ngValue]="0">Todas</option>
+        <option *ngFor="let c of companies" [ngValue]="c.id">{{c.name}}</option>
+      </select>
+    </div>
+
+    <div class="col-sm-4 col-md-3">
+      <label class="form-label fw-semibold">Buscar</label>
+      <input type="text" class="form-control" placeholder="Nombre o código"
+             [(ngModel)]="filtroTexto" name="fText">
+    </div>
+
+    <div class="col-auto ms-auto">
+      <div class="form-check mt-sm-4">
+        <input class="form-check-input" type="checkbox" id="chkLate"
+               [(ngModel)]="soloVencidos" name="fLate">
+        <label class="form-check-label" for="chkLate">
+          Sólo con pagos vencidos
+        </label>
+      </div>
+    </div>
+  </form>
+
+  <!-- SPINNER -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border"></div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="table-responsive" *ngIf="!loading">
+    <table class="table align-middle table-hover">
+      <thead>
+      <tr>
+        <th>Código</th>
+        <th>Plan</th>
+        <th>Compañía</th>
+        <th>Precio (mes)</th>
+        <th>Pagos</th>
+        <th class="text-end">Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let p of planesFiltrados">
+        <td>{{p.code}}</td>
+        <td>{{p.name}}</td>
+        <td>{{p.company?.name || '—'}}</td>
+        <td>{{p.price_monthly | currency:'USD':'symbol':'1.0-2'}}</td>
+        <td>
+         <span class="badge bg-warning me-1"
+               *ngIf="hasStatus(p.payments,'LATE')">
+          {{ countStatus(p.payments,'LATE') }} vencido(s)
+        </span>
+
+          <span class="badge bg-success"
+                *ngIf="hasStatus(p.payments,'PENDING')">
+          {{ countStatus(p.payments,'PENDING') }} próximo(s)
+        </span>
+        </td>
+        <td class="text-end">
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-primary"
+                    (click)="abrirPagos(p)">
+              <i class="bi bi-wallet2"></i>
+            </button>
+            <a class="btn btn-outline-secondary"
+               [routerLink]="['/plan-options',p.id]">
+              <i class="bi bi-sliders"></i>
+            </a>
+            <button class="btn btn-outline-secondary">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-outline-danger"
+                    (click)="eliminarPlan(p)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="planesFiltrados.length===0" class="text-center text-muted my-4">
+      No hay planes que coincidan con el filtro.
+    </p>
+  </div>
+
+  <!-- MODAL PAGOS -->
+  <div class="modal fade show d-block bg-dark bg-opacity-25"
+       *ngIf="showPaymentsModal"
+       (click)="cerrarPagos()">
+    <div class="modal-dialog modal-lg modal-dialog-centered"
+         (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            Pagos – {{planModal?.name}} ({{planModal?.code}})
+          </h5>
+          <button type="button" class="btn-close" (click)="cerrarPagos()"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-sm align-middle">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>Monto</th>
+              <th>Vence</th>
+              <th>Pagado</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let pg of pagosModal">
+              <td>{{pg.id}}</td>
+              <td>{{pg.amount | currency:'USD'}}</td>
+              <td>{{pg.due_date | date}}</td>
+              <td>{{pg.paid_date ? (pg.paid_date | date) : '—'}}</td>
+              <td>
+                <span class="badge bg-{{estadoPagoBadge(pg.status!)}}">
+                  {{pg.status}}
+                </span>
+              </td>
+              <td class="text-end">
+                <button *ngIf="pg.status==='PENDING' || pg.status==='LATE'"
+                        class="btn btn-sm btn-outline-success"
+                        (click)="registrarPago(pg)">
+                  Registrar pago
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <p *ngIf="pagosModal.length===0" class="text-center my-3 text-muted">
+            No hay pagos registrados para este plan.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="cerrarPagos()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,1 +1,418 @@
-<p>polizas works!</p>
+<!-- ======================================================================
+     POLIZAS – PLANTILLA ACTUALIZADA CON NUEVO PATRÓN DE DISEÑO
+     Listado + KPI + Filtros + Pagos + Formulario Crear/Editar
+     ====================================================================== -->
+
+<div class="polizas" *ngIf="!loading; else loadingTpl">
+
+  <!-- === HEADER DE LA PÁGINA === -->
+  <div class="page-header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2><i class="fas fa-shield-alt me-2"></i>Gestión de Pólizas</h2>
+          <p class="mb-0 opacity-75">Administra y monitorea todas las pólizas de seguros</p>
+        </div>
+        <button class="btn btn-light btn-lg fw-semibold" (click)="abrirCrearPoliza()">
+          <i class="fas fa-plus me-2"></i>Nueva Póliza
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === KPI DASHBOARD === -->
+  <div class="kpi-dashboard mb-4">
+    <div class="row g-3">
+      <div class="col-lg-3 col-md-6" *ngFor="let item of kpiLabels">
+        <div class="kpi-card">
+          <div class="kpi-icon">
+            <i class="fas fa-{{ getKpiIcon(item.key) }}"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ kpi[item.key] }}</h3>
+            <p class="kpi-label">{{ item.label }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === FILTROS === -->
+  <div class="filters-section mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">
+          <i class="fas fa-search me-2"></i>Búsqueda
+        </label>
+        <input [(ngModel)]="filtroTexto" class="form-control" placeholder="Buscar por número o plan…">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">
+          <i class="fas fa-building me-2"></i>Compañía
+        </label>
+        <select class="form-select" [(ngModel)]="filtroCompany">
+          <option [value]="0">Todas las compañías</option>
+          <option *ngFor="let p of policies" [value]="p.plan?.company_id">
+            {{ p.company?.name || 'Sin compañía' }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">
+          <i class="fas fa-flag me-2"></i>Estado
+        </label>
+        <select class="form-select" [(ngModel)]="filtroStatus">
+          <option value="">Todos los estados</option>
+          <option value="ACTIVE">Activas</option>
+          <option value="PENDING">Pendientes</option>
+          <option value="LATE">Vencidas</option>
+          <option value="CANCELLED">Canceladas</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <div class="form-check form-switch">
+          <input id="soloVencidos" type="checkbox" class="form-check-input" [(ngModel)]="soloVencidos">
+          <label class="form-check-label" for="soloVencidos">Solo vencidas</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === TABLA DE PÓLIZAS === -->
+  <div class="table-responsive" *ngIf="polizasFiltradas && polizasFiltradas.length > 0; else emptyState">
+    <table class="table list-table">
+      <thead>
+      <tr>
+        <th><i class="fas fa-hashtag me-2"></i>Número</th>
+        <th><i class="fas fa-user me-2"></i>Cliente</th>
+        <th><i class="fas fa-clipboard-list me-2"></i>Plan</th>
+        <th><i class="fas fa-building me-2"></i>Compañía</th>
+        <th><i class="fas fa-flag me-2"></i>Estado</th>
+        <th><i class="fas fa-credit-card me-2"></i>Pagos</th>
+        <th class="text-center"><i class="fas fa-cogs me-2"></i>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let p of polizasFiltradas">
+        <td data-label="Número">
+          <span class="fw-bold policy-number">{{ p.policy_number }}</span>
+        </td>
+        <td data-label="Cliente">
+          <div class="d-flex align-items-center" *ngIf="p.client; else noClient">
+            <div class="client-avatar">
+              {{ getClientInitials(p.client) }}
+            </div>
+            <span class="client-name">{{ p.client.first_name + ' ' + p.client.last_name }}</span>
+          </div>
+          <ng-template #noClient>
+              <span class="text-muted-custom">
+                <i class="fas fa-user-slash me-2"></i>Sin cliente asignado
+              </span>
+          </ng-template>
+        </td>
+        <td data-label="Plan">
+            <span *ngIf="p.plan; else noPlan" class="fw-medium">
+              <i class="fas fa-clipboard-list me-2 text-primary"></i>{{ p.plan.name }}
+            </span>
+          <ng-template #noPlan>
+              <span class="text-muted-custom">
+                <i class="fas fa-minus me-2"></i>Sin plan
+              </span>
+          </ng-template>
+        </td>
+        <td data-label="Compañía">
+            <span *ngIf="p.company; else noCompany" class="fw-medium">
+              <i class="fas fa-building me-2 text-info"></i>{{ p.company.name }}
+            </span>
+          <ng-template #noCompany>
+              <span class="text-muted-custom">
+                <i class="fas fa-minus me-2"></i>Sin compañía
+              </span>
+          </ng-template>
+        </td>
+        <td data-label="Estado">
+            <span class="badge status-badge status-{{ p.status?.toLowerCase() }}">
+              <i class="fas fa-{{ getStatusIcon(p.status!) }} me-1"></i>
+              {{ p.status }}
+            </span>
+        </td>
+        <td data-label="Pagos">
+          <div class="payments-badges">
+              <span *ngIf="countLate(p)" class="badge bg-danger me-1">
+                <i class="fas fa-exclamation-triangle me-1"></i>Venc.: {{ countLate(p) }}
+              </span>
+            <span *ngIf="countUpcoming(p)" class="badge bg-warning text-dark">
+                <i class="fas fa-clock me-1"></i>Pend.: {{ countUpcoming(p) }}
+              </span>
+            <span *ngIf="!countLate(p) && !countUpcoming(p)" class="badge bg-success">
+                <i class="fas fa-check-circle me-1"></i>Al día
+              </span>
+          </div>
+        </td>
+        <td data-label="Acciones" class="text-center">
+          <div class="action-buttons">
+            <button class="btn btn-sm btn-primary"
+                    (click)="abrirPagos(p)"
+                    title="Ver pagos">
+              <i class="fas fa-credit-card"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary"
+                    (click)="abrirEditarPoliza(p)"
+                    title="Editar póliza">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger"
+                    (click)="eliminarPoliza(p)"
+                    title="Eliminar póliza">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- === ESTADO VACÍO === -->
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <i class="fas fa-shield-alt"></i>
+      <h5>No hay pólizas registradas</h5>
+      <p>Comienza creando tu primera póliza de seguro.</p>
+      <button class="btn btn-primary mt-3" (click)="abrirCrearPoliza()">
+        <i class="fas fa-plus me-2"></i>Crear primera póliza
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- === INFORMACIÓN ADICIONAL === -->
+  <div class="mt-3" *ngIf="polizasFiltradas && polizasFiltradas.length > 0">
+    <small class="text-muted">
+      <i class="fas fa-info-circle me-2"></i>
+      Mostrando <strong>{{ polizasFiltradas.length }}</strong>  pólizas
+    </small>
+  </div>
+</div>
+
+<!-- === LOADER === -->
+<ng-template #loadingTpl>
+  <div class="loading-container">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-3 mb-0">Cargando pólizas…</p>
+  </div>
+</ng-template>
+
+<!-- =====================================================
+     MODAL PAGOS
+     ===================================================== -->
+<div *ngIf="showPaymentsModal" class="modal fade show d-block custom-modal" style="background:rgba(0,0,0,.6);">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-credit-card me-2"></i>
+          Pagos – Póliza {{ policyModal?.policy_number }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarPagos()"></button>
+      </div>
+
+      <div class="modal-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover m-0">
+            <thead class="table-light">
+            <tr>
+              <th><i class="fas fa-hashtag me-2"></i>#</th>
+              <th><i class="fas fa-calendar-alt me-2"></i>Fecha límite</th>
+              <th><i class="fas fa-calendar-check me-2"></i>Fecha de pago</th>
+              <th><i class="fas fa-dollar-sign me-2"></i>Monto</th>
+              <th><i class="fas fa-flag me-2"></i>Estado</th>
+              <th class="text-center"><i class="fas fa-cogs me-2"></i>Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let pg of pagosModal; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ pg.due_date | date:'shortDate' }}</td>
+              <td>{{ pg.paid_date ? (pg.paid_date | date:'shortDate') : '—' }}</td>
+              <td class="fw-bold text-success">${{ pg.amount.toFixed(2) }}</td>
+              <td>
+                  <span class="badge status-badge status-{{ pg.status?.toLowerCase() }}">
+                    <i class="fas fa-{{ getPaymentStatusIcon(pg.status) }} me-1"></i>
+                    {{ pg.status }}
+                  </span>
+              </td>
+              <td class="text-center">
+                <button *ngIf="pg.status === 'PENDING'"
+                        class="btn btn-success btn-sm"
+                        (click)="registrarPago(pg)">
+                  <i class="fas fa-check me-1"></i>
+                  Registrar pago
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarPagos()">
+          <i class="fas fa-times me-2"></i>Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     MODAL CREAR / EDITAR
+     ===================================================== -->
+<div *ngIf="showFormModal" class="modal fade show d-block custom-modal" style="background:rgba(0,0,0,.6);">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-{{ formMode === 'crear' ? 'plus' : 'edit' }} me-2"></i>
+          {{ formMode === 'crear' ? 'Nueva póliza' : 'Editar póliza' }}
+        </h5>
+        <button type="button" class="btn-close" (click)="showFormModal=false"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+        <form class="form-modern">
+
+          <!-- Campos básicos -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="fas fa-hashtag me-2"></i>Número de póliza
+              </label>
+              <input class="form-control" [(ngModel)]="formData.policy_number" name="policy_number">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="fas fa-flag me-2"></i>Estado
+              </label>
+              <select class="form-select" [(ngModel)]="formData.status" name="status">
+                <option value="ACTIVE">Activa</option>
+                <option value="PENDING">Pendiente</option>
+                <option value="LATE">Vencida</option>
+                <option value="CANCELLED">Cancelada</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="fas fa-user me-2"></i>Cliente
+              </label>
+              <select class="form-select" [(ngModel)]="formData.client_id" name="client_id">
+                <option [ngValue]="null">Seleccione cliente</option>
+                <option *ngFor="let c of clientes" [value]="c.id">
+                  {{ c.first_name }} {{ c.last_name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="fas fa-clipboard-list me-2"></i>Plan
+              </label>
+              <select class="form-select" [(ngModel)]="formData.plan_id" name="plan_id">
+                <option [ngValue]="null">Seleccione plan</option>
+                <option *ngFor="let pl of planes" [value]="pl.id">{{ pl.name }}</option>
+              </select>
+            </div>
+
+            <!-- Fecha inicio / fin -->
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="fas fa-calendar-alt me-2"></i>Fecha de inicio
+              </label>
+              <input type="date" class="form-control" [(ngModel)]="formData.start_date" name="start_date">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">
+                <i class="fas fa-calendar-times me-2"></i>Fecha de fin
+              </label>
+              <input type="date" class="form-control" [(ngModel)]="formData.end_date" name="end_date">
+            </div>
+          </div>
+
+          <!-- ======== CAMPOS EXTRA POR TIPO ======== -->
+          <div class="extra-fields mt-4" *ngIf="tipoSeguro">
+            <h6 class="text-primary mb-3">
+              <i class="fas fa-info-circle me-2"></i>
+              Información específica del seguro
+            </h6>
+
+            <ng-container [ngSwitch]="tipoSeguro">
+
+              <!-- AUTO -->
+              <div *ngSwitchCase="'auto'" class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-car me-2"></i>Placa del vehículo
+                  </label>
+                  <input class="form-control" [(ngModel)]="formData.extra_auto_placa" name="auto_placa">
+                </div>
+              </div>
+
+              <!-- VIDA -->
+              <div *ngSwitchCase="'vida'" class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-users me-2"></i>Número de beneficiarios
+                  </label>
+                  <input type="number" class="form-control" [(ngModel)]="formData.extra_vida_beneficiarios" name="vida_beneficiarios">
+                </div>
+              </div>
+
+              <!-- HOGAR -->
+              <div *ngSwitchCase="'hogar'" class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-home me-2"></i>Valor estimado de la vivienda (USD)
+                  </label>
+                  <input type="number" class="form-control" [(ngModel)]="formData.extra_hogar_valor_vivienda" name="hogar_valor">
+                </div>
+              </div>
+
+              <!-- VIAJE -->
+              <div *ngSwitchCase="'viaje'" class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-map-marker-alt me-2"></i>País de origen
+                  </label>
+                  <input class="form-control" [(ngModel)]="formData.extra_viaje_pais_origen" name="viaje_origen">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-globe me-2"></i>País destino
+                  </label>
+                  <input class="form-control" [(ngModel)]="formData.extra_viaje_pais_destino" name="viaje_destino">
+                </div>
+              </div>
+
+            </ng-container>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="guardarPoliza()">
+          <i class="fas fa-save me-2"></i>Guardar
+        </button>
+        <button class="btn btn-secondary" (click)="showFormModal=false">
+          <i class="fas fa-times me-2"></i>Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

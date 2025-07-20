@@ -1,0 +1,116 @@
+<div class="step2-tipo-seguro">
+
+  <!-- Header del paso -->
+  <div class="step-header">
+    <h2>Selecciona tu Plan de Seguro</h2>
+    <p class="step-subtitle">Elige el plan que mejor se adapte a tus necesidades</p>
+  </div>
+
+  <!-- Formulario principal -->
+  <form class="plans-form" (ngSubmit)="continuar()" #formTipo="ngForm">
+
+    <!-- Sección: Planes Disponibles -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-shield-check"></i>
+        Planes Disponibles
+      </h3>
+
+      <div class="plans-grid">
+        <div class="plan-card" *ngFor="let plan of plans"
+             [class.selected]="selectedPlanId === plan.id"
+             (click)="selectPlan(plan.id)">
+
+          <div class="plan-radio">
+            <input
+              class="plan-radio-input"
+              type="radio"
+              name="plan"
+              [value]="plan.id"
+              [(ngModel)]="selectedPlanId"
+              required
+              [id]="'plan-' + plan.id"
+              (change)="onPlanSelect(plan.id)" />
+            <label class="plan-radio-label" [for]="'plan-' + plan.id">
+              <div class="radio-custom"></div>
+            </label>
+          </div>
+
+          <div class="plan-content">
+            <div class="plan-header">
+              <h4 class="plan-name">{{ plan.name }}</h4>
+              <div class="plan-price">
+                <span class="price-amount">${{ plan.price_monthly }}</span>
+                <span class="price-period">/mes</span>
+              </div>
+              <div class="plan-price-yearly">
+                <span class="yearly-price">${{ plan.price_yearly }}/año</span>
+                <span class="yearly-savings" *ngIf="plan.price_yearly < (plan.price_monthly * 12)">
+                  Ahorra ${{ (plan.price_monthly * 12) - plan.price_yearly }}
+                </span>
+              </div>
+            </div>
+
+            <div class="plan-features" *ngIf="plan.benefits && plan.benefits.length > 0">
+              <ul class="features-list">
+                <li *ngFor="let benefit of plan.benefits" class="feature-item">
+                  <i class="bi bi-check-circle-fill"></i>
+                  {{ benefit }}
+                </li>
+              </ul>
+            </div>
+
+            <div class="plan-description">
+              <p>{{ plan.description }}</p>
+            </div>
+
+            <div class="plan-coverage" *ngIf="plan.coverage && plan.coverage.length > 0">
+              <h5 class="coverage-title">
+                <i class="bi bi-shield-fill-check"></i>
+                Cobertura
+              </h5>
+              <ul class="coverage-list">
+                <li *ngFor="let item of plan.coverage" class="coverage-item">
+                  <i class="bi bi-arrow-right-circle"></i>
+                  {{ item }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div class="alert alert-warning" *ngIf="showValidationError">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Por favor, selecciona un plan válido para continuar
+      </div>
+
+      <!-- Mensaje de ayuda -->
+      <div class="form-text help-text">
+        <i class="bi bi-info-circle"></i>
+        Puedes cambiar tu plan en cualquier momento después de la contratación
+      </div>
+    </div>
+
+    <!-- Acciones del formulario -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="retroceder()">
+        <i class="bi bi-arrow-left"></i>
+        Anterior
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!formTipo.valid">
+        <i class="bi bi-arrow-right"></i>
+        Continuar
+      </button>
+    </div>
+
+  </form>
+</div>

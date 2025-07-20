@@ -10,4 +10,5 @@ export interface PlanBase {
   coverage: string[];
   benefits: string[];
   created_at: string;
+
 }

@@ -40,7 +40,7 @@ export class DashboardService {
         const sortByDate = <T extends { created_at?: string }>(a:T,b:T)=>
           new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime();
 
-        const lastClients    = [...clients].sort(sortByDate).slice(0,5);
+        const lastClients    = [...clients].sort(sortByDate).slice(0,6);
         const lastQuotations = [...quotations].sort(sortByDate).slice(0,5);
 
         return {

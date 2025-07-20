@@ -9,7 +9,7 @@
     <!-- Header con título y botón -->
     <div class="page-header">
       <div class="d-flex justify-content-between align-items-center">
-        <h2 class="m-0">Cotizaciones</h2>
+        <h2 class="m-0"><i class="bi-filetype-doc"></i> Cotizaciones</h2>
         <button class="btn btn-primary" (click)="irCrear()">
           <i class="bi bi-plus-circle me-1"></i>
           Nueva
@@ -154,21 +154,13 @@
           [cliente]="datosCliente"
           [planBase]="planBaseSeleccionado"
           [planOption]="selectedPlanOption"
-          (prev)="retroceder()">
+          [isProcessing]="isProcessing"
+          (prev)="retroceder()"
+          (enviarCotizacion)="finalizarCotizacion()">
         </app-step5-resumen-cotizacion>
 
       </ng-container>
 
-      <!-- Botón final de envío -->
-      <div *ngIf="step === 5" class="text-end mt-4">
-        <button type="button"
-                class="btn btn-success btn-lg"
-                (click)="finalizarCotizacion()"
-                [disabled]="isProcessing">
-          <i class="bi bi-send me-1"></i>
-          {{ isProcessing ? 'Procesando...' : 'Enviar Cotización' }}
-        </button>
-      </div>
 
     </div>
 

@@ -1,0 +1,153 @@
+<div class="step5-resumen-cotizacion">
+
+  <!-- Header del paso -->
+  <div class="step-header">
+    <h2>Resumen de la Cotización</h2>
+    <p class="step-subtitle">Revisa todos los detalles antes de continuar</p>
+  </div>
+
+  <!-- Formulario principal -->
+  <div class="summary-form">
+
+    <!-- Sección: Datos del Cliente -->
+    <div class="summary-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <h3 class="section-title">Datos del Cliente</h3>
+      </div>
+
+      <div class="section-content">
+        <ul class="data-list">
+          <li class="data-item">
+            <span class="data-label">Nombre:</span>
+            <span class="data-value">{{ cliente.nombres }} {{ cliente.apellidos }}</span>
+          </li>
+          <li class="data-item">
+            <span class="data-label">Email:</span>
+            <span class="data-value">{{ cliente.correo }}</span>
+          </li>
+          <li class="data-item">
+            <span class="data-label">Teléfono:</span>
+            <span class="data-value">{{ cliente.telefono }}</span>
+          </li>
+          <li class="data-item">
+            <span class="data-label">Ciudad:</span>
+            <span class="data-value">{{ cliente.ciudad }}</span>
+          </li>
+          <li class="data-item">
+            <span class="data-label">Ocupación:</span>
+            <span class="data-value">{{ cliente.ocupacion }}</span>
+          </li>
+          <li class="data-item">
+            <span class="data-label">Ingresos:</span>
+            <span class="data-value">{{ cliente.ingresos | currency }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sección: Plan Base -->
+    <div class="summary-section" *ngIf="planBase">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <h3 class="section-title">Plan Base Seleccionado</h3>
+      </div>
+
+      <div class="section-content">
+        <div class="plan-summary">
+          <p class="plan-name">
+            {{ planBase.name }}
+            <small class="plan-code">(Código: {{ planBase.code }})</small>
+          </p>
+          <p class="plan-description">{{ planBase.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Opción Elegida -->
+    <div class="summary-section" *ngIf="planOption">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="bi bi-bullseye"></i>
+        </div>
+        <h3 class="section-title">Opción de Plan Elegida</h3>
+      </div>
+
+      <div class="section-content">
+        <div class="option-card">
+          <div class="option-header">
+            <h4 class="option-name">{{ planOption.name }}</h4>
+            <p class="option-description">{{ planOption.description }}</p>
+
+            <div class="option-pricing">
+              <div class="primary-price">
+                <span class="price-amount">{{ planOption.price_yearly | currency:'USD':'symbol':'1.2-2' }}</span>
+                <span class="price-period">/ año</span>
+              </div>
+              <div class="secondary-price">
+                ({{ planOption.price_monthly | currency:'USD':'symbol':'1.2-2' }} / mes)
+              </div>
+            </div>
+          </div>
+
+          <div class="option-details">
+            <!-- Coberturas -->
+            <div class="details-section coverage-section" *ngIf="planOption.coverage && planOption.coverage.length > 0">
+              <div class="details-title">
+                <span class="details-icon">🛡️</span>
+                <span>Coberturas</span>
+              </div>
+              <ul class="details-list">
+                <li *ngFor="let c of planOption.coverage" class="details-item">
+                  <i class="bi bi-check-circle-fill item-bullet"></i>
+                  <span class="item-text">{{ c }}</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Beneficios -->
+            <div class="details-section benefits-section" *ngIf="planOption.benefits && planOption.benefits.length > 0">
+              <div class="details-title">
+                <span class="details-icon">🎁</span>
+                <span>Beneficios</span>
+              </div>
+              <ul class="details-list">
+                <li *ngFor="let b of planOption.benefits" class="details-item">
+                  <i class="bi bi-star-fill item-bullet"></i>
+                  <span class="item-text">{{ b }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones del formulario -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="volver()">
+        <i class="bi bi-arrow-left"></i>
+        Anterior
+      </button>
+
+      <div class="send-wrapper text-end mt-4" [@fadeSlide]>
+        <button type="button"
+                class="btn btn-success btn-lg"
+                (click)="enviarCotizacion.emit()"
+                [disabled]="isProcessing">
+          <i class="bi bi-send me-1"></i>
+          {{ isProcessing ? 'Procesando...' : 'Enviar Cotización' }}
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>

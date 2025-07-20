@@ -1,0 +1,199 @@
+<div class="step3-viaje">
+
+  <!-- Header del paso -->
+  <div class="step-header">
+    <h2>Detalles de Seguro de Viaje</h2>
+    <p class="step-subtitle">Completa la información específica para tu viaje</p>
+  </div>
+
+  <!-- Formulario principal -->
+  <form class="travel-form" (ngSubmit)="siguientePaso()" #formViaje="ngForm">
+
+    <!-- Sección: Fechas del Viaje -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-calendar-check"></i>
+        Fechas del Viaje
+      </h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fechaInicio" class="form-label">
+            <i class="bi bi-calendar-date"></i>
+            Fecha de Inicio
+          </label>
+          <input
+            type="date"
+            id="fechaInicio"
+            name="fechaInicio"
+            class="form-control"
+            [(ngModel)]="viajeForm().fechaInicio"
+            required
+            #fechaInicio="ngModel">
+          <div class="invalid-feedback" *ngIf="fechaInicio.invalid && fechaInicio.touched">
+            La fecha de inicio es requerida
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fechaFin" class="form-label">
+            <i class="bi bi-calendar-x"></i>
+            Fecha de Fin
+          </label>
+          <input
+            type="date"
+            id="fechaFin"
+            name="fechaFin"
+            class="form-control"
+            [(ngModel)]="viajeForm().fechaFin"
+            required
+            #fechaFin="ngModel">
+          <div class="invalid-feedback" *ngIf="fechaFin.invalid && fechaFin.touched">
+            La fecha de fin es requerida
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Destino y Origen -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-geo-alt"></i>
+        Destino y Origen
+      </h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="destino" class="form-label">
+            <i class="bi bi-airplane"></i>
+            Destino
+          </label>
+          <input
+            type="text"
+            id="destino"
+            name="destino"
+            class="form-control"
+            placeholder="Ej: París, Francia"
+            [(ngModel)]="viajeForm().destino"
+            required
+            #destino="ngModel">
+          <div class="invalid-feedback" *ngIf="destino.invalid && destino.touched">
+            El destino es requerido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="paisResidencia" class="form-label">
+            <i class="bi bi-house"></i>
+            País de Residencia
+          </label>
+          <input
+            type="text"
+            id="paisResidencia"
+            name="paisResidencia"
+            class="form-control"
+            placeholder="Ej: Ecuador"
+            [(ngModel)]="viajeForm().paisResidencia"
+            required
+            #paisResidencia="ngModel">
+          <div class="invalid-feedback" *ngIf="paisResidencia.invalid && paisResidencia.touched">
+            El país de residencia es requerido
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Detalles del Viaje -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-info-circle"></i>
+        Detalles del Viaje
+      </h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="motivoViaje" class="form-label">
+            <i class="bi bi-briefcase"></i>
+            Motivo del Viaje
+          </label>
+          <select
+            id="motivoViaje"
+            name="motivoViaje"
+            class="form-control"
+            [(ngModel)]="viajeForm().motivoViaje"
+            required
+            #motivoViaje="ngModel">
+            <option value="" disabled>Selecciona el motivo</option>
+            <option value="turismo">Turismo</option>
+            <option value="negocios">Negocios</option>
+            <option value="estudios">Estudios</option>
+            <option value="trabajo">Trabajo</option>
+            <option value="familia">Visita familiar</option>
+            <option value="medico">Tratamiento médico</option>
+            <option value="otro">Otro</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="motivoViaje.invalid && motivoViaje.touched">
+            El motivo del viaje es requerido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cobertura" class="form-label">
+            <i class="bi bi-shield-check"></i>
+            Tipo de Cobertura
+          </label>
+          <select
+            id="cobertura"
+            name="cobertura"
+            class="form-control"
+            [(ngModel)]="viajeForm().cobertura"
+            required
+            #cobertura="ngModel">
+            <option value="" disabled>Selecciona la cobertura</option>
+            <option value="basica">Básica</option>
+            <option value="completa">Completa</option>
+            <option value="premium">Premium</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="cobertura.invalid && cobertura.touched">
+            El tipo de cobertura es requerido
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="form-section">
+      <div class="info-card">
+        <i class="bi bi-info-circle-fill"></i>
+        <div class="info-content">
+          <h4>Información Importante</h4>
+          <ul>
+            <li>El seguro debe contratarse antes del inicio del viaje</li>
+            <li>La cobertura inicia desde la fecha de salida de tu país</li>
+            <li>Revisa los requisitos específicos según tu destino</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones del formulario -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="retroceder()">
+        <i class="bi bi-arrow-left"></i>
+        Anterior
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!formViaje.valid">
+        <i class="bi bi-arrow-right"></i>
+        Siguiente
+      </button>
+    </div>
+
+  </form>
+</div>

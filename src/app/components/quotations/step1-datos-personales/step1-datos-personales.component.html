@@ -1,0 +1,247 @@
+<div class="step1-datos-personales">
+
+  <!-- Header del paso -->
+  <div class="step-header">
+    <h2>Datos Personales</h2>
+    <p class="step-subtitle">Completa la información básica para generar tu cotización</p>
+  </div>
+
+  <!-- Formulario principal -->
+  <form class="personal-form" (ngSubmit)="continuar()" #formDatos="ngForm">
+
+    <!-- Sección: Información Personal -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-person-circle"></i>
+        Información Personal
+      </h3>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="nombres" class="form-label">
+              <i class="bi bi-person field-icon"></i>
+              Nombres
+              <span class="required-asterisk">*</span>
+            </label>
+            <input
+              type="text"
+              id="nombres"
+              name="nombres"
+              class="form-control"
+              [(ngModel)]="datosCliente.nombres"
+              required
+              placeholder="Ingresa tus nombres">
+            <div class="form-text">
+              <i class="bi bi-info-circle"></i>
+              Campo obligatorio
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="apellidos" class="form-label">
+              <i class="bi bi-person field-icon"></i>
+              Apellidos
+              <span class="required-asterisk">*</span>
+            </label>
+            <input
+              type="text"
+              id="apellidos"
+              name="apellidos"
+              class="form-control"
+              [(ngModel)]="datosCliente.apellidos"
+              required
+              placeholder="Ingresa tus apellidos">
+            <div class="form-text">
+              <i class="bi bi-info-circle"></i>
+              Campo obligatorio
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="correo" class="form-label">
+              <i class="bi bi-envelope field-icon"></i>
+              Correo Electrónico
+              <span class="required-asterisk">*</span>
+            </label>
+            <input
+              type="email"
+              id="correo"
+              name="correo"
+              class="form-control"
+              [(ngModel)]="datosCliente.correo"
+              required
+              placeholder="ejemplo@correo.com">
+            <div class="form-text">
+              <i class="bi bi-info-circle"></i>
+              Usaremos este correo para enviarte la cotización
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="telefono" class="form-label">
+              <i class="bi bi-telephone field-icon"></i>
+              Teléfono
+              <span class="required-asterisk">*</span>
+            </label>
+            <input
+              type="tel"
+              id="telefono"
+              name="telefono"
+              class="form-control"
+              [(ngModel)]="datosCliente.telefono"
+              required
+              placeholder="(+593) 999-999-999">
+            <div class="form-text">
+              <i class="bi bi-info-circle"></i>
+              Incluye código de país
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="fechaNacimiento" class="form-label">
+              <i class="bi bi-calendar-event field-icon"></i>
+              Fecha de Nacimiento
+            </label>
+            <input
+              type="date"
+              id="fechaNacimiento"
+              name="fechaNacimiento"
+              class="form-control"
+              [(ngModel)]="datosCliente.fechaNacimiento">
+            <div class="form-text">
+              <i class="bi bi-info-circle"></i>
+              Nos ayuda a calcular mejor tu prima
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="ciudad" class="form-label">
+              <i class="bi bi-geo-alt field-icon"></i>
+              Ciudad
+            </label>
+            <input
+              type="text"
+              id="ciudad"
+              name="ciudad"
+              class="form-control"
+              [(ngModel)]="datosCliente.ciudad"
+              placeholder="Ej: Guayaquil, Quito">
+            <div class="form-text">
+              <i class="bi bi-info-circle"></i>
+              Ciudad donde resides actualmente
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Información Laboral -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-briefcase"></i>
+        Información Laboral
+      </h3>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="ocupacion" class="form-label">
+              <i class="bi bi-person-workspace field-icon"></i>
+              Ocupación
+            </label>
+            <input
+              type="text"
+              id="ocupacion"
+              name="ocupacion"
+              class="form-control"
+              [(ngModel)]="datosCliente.ocupacion"
+              placeholder="Ej: Ingeniero, Médico, Estudiante">
+            <div class="form-text">
+              <i class="bi bi-info-circle"></i>
+              Tu profesión u ocupación actual
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="ingresos" class="form-label">
+              <i class="bi bi-currency-dollar field-icon"></i>
+              Ingresos Mensuales
+            </label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input
+                type="number"
+                id="ingresos"
+                name="ingresos"
+                class="form-control"
+                [(ngModel)]="datosCliente.ingresos"
+                min="0"
+                step="0.01"
+                placeholder="0.00">
+              <span class="input-group-text">USD</span>
+            </div>
+            <div class="form-text">
+              <i class="bi bi-info-circle"></i>
+              Información confidencial para calcular tu cobertura
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Información de Contacto -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-house"></i>
+        Información de Contacto
+      </h3>
+
+      <div class="form-group">
+        <label for="direccion" class="form-label">
+          <i class="bi bi-geo-alt field-icon"></i>
+          Dirección
+        </label>
+        <input
+          type="text"
+          id="direccion"
+          name="direccion"
+          class="form-control"
+          [(ngModel)]="datosCliente.direccion"
+          placeholder="Calle principal, número, sector">
+        <div class="form-text">
+          <i class="bi bi-info-circle"></i>
+          Dirección completa de tu domicilio
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones del formulario -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!formDatos.valid">
+        <i class="bi bi-arrow-right"></i>
+        Guardar y Continuar
+      </button>
+    </div>
+
+  </form>
+</div>

@@ -1,0 +1,113 @@
+<div class="step4-comparar-opciones">
+
+  <!-- Header del paso -->
+  <div class="step-header">
+    <h2>Compara Opciones</h2>
+    <p class="step-subtitle">Selecciona la opción que mejor se adapte a tus necesidades</p>
+  </div>
+
+  <!-- Formulario principal -->
+  <div class="options-form">
+
+    <!-- Sección: Opciones Disponibles -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-compare"></i>
+        Opciones Disponibles
+      </h3>
+
+      <div class="options-grid">
+        <div class="option-card" *ngFor="let plan of planOptions"
+             [class.selected]="selectedOption?.id === plan.id"
+             (click)="seleccionarOpcion(plan)">
+
+          <div class="option-content">
+            <div class="option-header">
+              <h4 class="option-name">{{ plan.name }}</h4>
+              <p class="option-description">{{ plan.description }}</p>
+
+              <div class="option-price">
+                <div class="price-monthly">
+                  <span class="price-amount">${{ plan.price_monthly | number:'1.2-2' }}</span>
+                  <span class="price-period">/mes</span>
+                </div>
+                <div class="price-yearly">
+                  ${{ plan.price_yearly | number:'1.2-2' }} anual
+                </div>
+              </div>
+            </div>
+
+            <div class="option-sections">
+              <!-- Sección de Coberturas -->
+              <div class="section coverage-section" *ngIf="plan.coverage && plan.coverage.length > 0">
+                <div class="section-header">
+                  <span class="section-icon">🛡️</span>
+                  <span>Coberturas</span>
+                </div>
+                <ul class="section-list">
+                  <li *ngFor="let c of plan.coverage" class="section-item">
+                    <i class="bi bi-check-circle-fill item-icon"></i>
+                    <span class="item-text">{{ c }}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Sección de Beneficios -->
+              <div class="section benefits-section" *ngIf="plan.benefits && plan.benefits.length > 0">
+                <div class="section-header">
+                  <span class="section-icon">🎁</span>
+                  <span>Beneficios</span>
+                </div>
+                <ul class="section-list">
+                  <li *ngFor="let b of plan.benefits" class="section-item">
+                    <i class="bi bi-star-fill item-icon"></i>
+                    <span class="item-text">{{ b }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div class="alert alert-warning" *ngIf="!selectedOption && planOptions.length > 0">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Por favor, selecciona una opción para continuar
+      </div>
+
+      <!-- Mensaje de ayuda -->
+      <div class="form-text help-text" *ngIf="planOptions.length > 0">
+        <i class="bi bi-info-circle"></i>
+        Compara las diferentes opciones y elige la que mejor se adapte a tu presupuesto y necesidades
+      </div>
+
+      <!-- Mensaje cuando no hay opciones -->
+      <div class="alert alert-warning" *ngIf="planOptions.length === 0">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        No se encontraron opciones disponibles para el plan seleccionado
+      </div>
+    </div>
+
+    <!-- Acciones del formulario -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="retroceder()">
+        <i class="bi bi-arrow-left"></i>
+        Anterior
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="!selectedOption"
+        (click)="continuar()">
+        <i class="bi bi-arrow-right"></i>
+        Siguiente
+      </button>
+    </div>
+
+  </div>
+</div>

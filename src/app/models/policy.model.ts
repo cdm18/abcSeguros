@@ -11,4 +11,7 @@ export interface Policy {
   status?: PolicyStatus;
   created_from_q?: number;
   created_at?: string;
+
+  // Agrega esta línea
+  metadata?: Record<string, string>;
 }

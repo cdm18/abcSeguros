@@ -6,13 +6,26 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-step1-datos-personales',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './step1-datos-personales.component.html'
+  templateUrl: './step1-datos-personales.component.html',
+  styleUrls: ['./step1-datos-personales.component.scss']
 })
 export class Step1DatosPersonalesComponent {
   @Input() datosCliente!: any;
   @Output() guardar = new EventEmitter<void>();
 
   continuar() {
-    this.guardar.emit();
+    // Validar datos antes de continuar
+    if (this.isValidForm()) {
+      this.guardar.emit();
+    }
+  }
+
+  private isValidForm(): boolean {
+    return !!(
+      this.datosCliente.nombres &&
+      this.datosCliente.apellidos &&
+      this.datosCliente.correo &&
+      this.datosCliente.telefono
+    );
   }
 }

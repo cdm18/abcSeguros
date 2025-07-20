@@ -1,0 +1,404 @@
+/* ============================================================================
+   CLIENTES COMPONENT STYLES
+   ============================================================================ */
+
+.clientes {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  // ESTILOS GENERALES
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  .page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 0;
+    margin: -2rem -2rem 2rem -2rem; // Aumentar margen superior y laterales
+    border-radius: 0 0 1rem 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    // Agregar padding interno para compensar el margen negativo
+    .container,
+    .d-flex {
+      padding: 0 2rem; // Compensar el margen lateral negativo
+    }
+
+    h2 {
+      font-weight: 700;
+      margin: 0;
+    }
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  // ESTILOS PARA EL LISTADO
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  .list-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: none;
+
+    thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+      th {
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border: none;
+        vertical-align: middle;
+
+        i {
+          opacity: 0.8;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #f1f3f4;
+
+        &:hover {
+          background-color: #f8f9ff;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 1rem;
+          vertical-align: middle;
+          border: none;
+
+          // Estilos para la columna ID
+          &[data-label="ID"] {
+            .fw-bold {
+              color: #667eea;
+              font-weight: 700;
+              font-size: 1.1rem;
+            }
+          }
+
+          // Estilos para la columna Nombre con avatar
+          &[data-label="Nombre"] {
+            .d-flex {
+              align-items: center;
+              gap: 0.75rem;
+            }
+
+            .client-avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 700;
+              font-size: 0.85rem;
+              letter-spacing: 0.5px;
+              flex-shrink: 0;
+              box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+              transition: all 0.3s ease;
+
+              &:hover {
+                transform: scale(1.1);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+              }
+            }
+
+            .client-name {
+              color: #2d3748;
+              font-weight: 600;
+              font-size: 1rem;
+            }
+          }
+
+          // Estilos para la columna Correo
+          &[data-label="Correo"] {
+            i {
+              color: #667eea;
+              opacity: 0.7;
+              transition: all 0.3s ease;
+            }
+
+            .fw-medium {
+              color: #2d3748;
+              font-weight: 500;
+              font-size: 0.9rem;
+            }
+
+            &:hover i {
+              opacity: 1;
+              transform: scale(1.1);
+            }
+          }
+
+          // Estilos para la columna Teléfono
+          &[data-label="Teléfono"] {
+            i {
+              color: #48bb78;
+              opacity: 0.7;
+              transition: all 0.3s ease;
+            }
+
+            .fw-medium {
+              color: #2d3748;
+              font-weight: 500;
+            }
+
+            .text-muted-custom {
+              color: #a0aec0;
+              font-style: italic;
+              font-size: 0.85rem;
+            }
+
+            &.no-data {
+              opacity: 0.7;
+            }
+
+            &:hover i {
+              opacity: 1;
+              transform: scale(1.1);
+            }
+          }
+
+          // Estilos para la columna Dirección
+          &[data-label="Dirección"] {
+            i {
+              color: #ed8936;
+              opacity: 0.7;
+              transition: all 0.3s ease;
+            }
+
+            .text-muted-custom {
+              color: #a0aec0;
+              font-style: italic;
+              font-size: 0.85rem;
+            }
+
+            &.no-data {
+              opacity: 0.7;
+            }
+
+            &:hover i {
+              opacity: 1;
+              transform: scale(1.1);
+            }
+          }
+        }
+      }
+
+      // Animación para las filas de la tabla
+      tr:hover {
+        .client-avatar {
+          transform: scale(1.05);
+          box-shadow: 0 3px 8px rgba(102, 126, 234, 0.35);
+        }
+      }
+    }
+  }
+
+  // Estado vacío
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #718096;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+    i {
+      font-size: 4rem;
+      color: #cbd5e0;
+      margin-bottom: 1rem;
+    }
+
+    h5 {
+      color: #4a5568;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    p {
+      color: #718096;
+      margin: 0;
+    }
+  }
+
+  // Información adicional (contador de clientes)
+  .mt-3 {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    small {
+      color: #4a5568;
+      font-weight: 500;
+
+      i {
+        color: #667eea;
+        opacity: 0.7;
+      }
+
+      strong {
+        color: #2d3748;
+        font-weight: 700;
+      }
+    }
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  // COMPONENTES COMPARTIDOS
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3em;
+
+    &.text-primary {
+      color: #667eea !important;
+    }
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  // RESPONSIVE DESIGN
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  @media (max-width: 768px) {
+    .page-header {
+      margin: -1rem -1rem 1rem -1rem;
+      padding: 1.5rem 1rem;
+
+      .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 0;
+      }
+    }
+
+    .list-table {
+      thead {
+        display: none;
+      }
+
+      tbody {
+        tr {
+          display: block;
+          margin-bottom: 1rem;
+          border-radius: 12px;
+          padding: 1rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          background: white;
+
+          &:hover {
+            transform: none;
+          }
+
+          td {
+            display: block;
+            padding: 0.5rem 0;
+            border: none;
+
+            &:before {
+              content: attr(data-label) ": ";
+              font-weight: 600;
+              color: #4a5568;
+              display: inline-block;
+              width: 100px;
+              margin-bottom: 0.25rem;
+            }
+
+            // Ajustes específicos para móvil
+            &[data-label="Nombre"] {
+              .d-flex {
+                flex-direction: row;
+                align-items: center;
+                gap: 0.75rem;
+                margin-top: 0.5rem;
+              }
+
+              &:before {
+                display: block;
+                width: auto;
+                margin-bottom: 0.5rem;
+              }
+            }
+
+            &[data-label="ID"] {
+              border-bottom: 2px solid #e2e8f0;
+              padding-bottom: 0.75rem;
+              margin-bottom: 0.75rem;
+
+              .fw-bold {
+                font-size: 1.2rem;
+              }
+            }
+
+            // Espaciado para los íconos en móvil
+            i {
+              margin-right: 0.5rem !important;
+            }
+          }
+        }
+      }
+    }
+
+    .empty-state,
+    .mt-3 {
+      margin: 0 -1rem;
+      border-radius: 12px 12px 0 0;
+    }
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+  // ANIMACIONES
+  // ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .list-table tbody tr,
+  .empty-state,
+  .mt-3 {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .client-avatar:active {
+    animation: pulse 0.2s ease-out;
+  }
+}

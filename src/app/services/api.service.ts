@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
-
 import { Client } from '../models/client.model';
 import { Policy } from '../models/policy.model';
 import { PlanBase } from '../models/plan-base.model';
@@ -97,6 +96,19 @@ export class ApiService {
     return this.get<Client>(`/clients/${id}`);
   }
 
+  /* ⬇️ alta rápida para el wizard
+     Acepta solo nombre, apellido, email y teléfono.
+     Ajusta los nombres de acuerdo con tu API si usa snake_case. */
+  createClientSimplified(data: {
+    first_name: string;
+    last_name : string;
+    email     : string;
+    phone     : string;
+  }): Observable<Client> {
+    return this.post<Client>('/clients', data);
+  }
+
+  /* …si ya tenías un createClient “completo”, déjalo también: */
   createClient(data: Partial<Client>): Observable<Client> {
     if (!data) {
       return throwError(() => new Error('Datos del cliente requeridos'));
@@ -120,6 +132,9 @@ export class ApiService {
     }
     return this.delete<void>(`/clients/${id}`);
   }
+
+
+
 
   /* -------------- Plans Base (PlanBase) -------------- */
   getPlans(): Observable<PlanBase[]> {
@@ -369,4 +384,21 @@ export class ApiService {
   getDashboardStats(): Observable<any> {
     return this.get('/dashboard/stats');
   }
+
+  getPaymentsByPlan(planId: number) {
+    return this.get<Payment[]>(`/payments?planId=${planId}`);
+  }
+
+  // src/app/services/api.service.ts
+  getPolicyMetadata(id: number): Observable<any> {
+    return this.http.get<any>(`{/policies/${id}/metadata`);
+  }
+
+  updatePolicyMetadata(id: number, metadata: any): Observable<any> {
+    return this.http.put(`/policies/${id}/metadata`, metadata);
+  }
+
+
+
+
 }
