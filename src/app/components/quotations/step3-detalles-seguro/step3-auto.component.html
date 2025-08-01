@@ -1,17 +1,193 @@
-<h2>Detalles de Seguro de Auto</h2>
-<p>Informacion especifica del seguro</p>
+<!-- step3-auto.component.html -->
+<div class="step3-auto">
 
-<form (ngSubmit)="siguientePaso()">
-  <input [(ngModel)]="autoForm().tipoVehiculo" name="tipoVehiculo" placeholder="Tipo de Vehiculo">
-  <input [(ngModel)]="autoForm().matricula" name="matricula" placeholder="Matricula">
-  <input [(ngModel)]="autoForm().anioVehiculo" name="anioVehiculo" placeholder="Año del Vehiculo">
-  <input [(ngModel)]="autoForm().marcaVehiculo" name="marcaVehiculo" placeholder="Marca del Vehiculo">
-  <input [(ngModel)]="autoForm().modeloVehiculo" name="modeloVehiculo" placeholder="Modelo del Vehiculo">
-  <input [(ngModel)]="autoForm().tipoCombustible" name="tipoCombustible" placeholder="Tipo de Combustible">
-  <input [(ngModel)]="autoForm().cobertura" name="cobertura" placeholder="Tipo de cobertura deseada">
+  <!-- Header del paso -->
+  <div class="step-header">
+    <h2>Detalles de Seguro de Auto</h2>
+    <p class="step-subtitle">Información específica del seguro</p>
+  </div>
 
-  <label><input type="checkbox" [(ngModel)]="autoForm().asistenciaVial" name="asistenciaVial"> Asistencia Vial</label>
-  <label><input type="checkbox" [(ngModel)]="autoForm().vehiculoSustituto" name="vehiculoSustituto"> Vehículo Sustituto</label>
+  <!-- Formulario principal -->
+  <form class="auto-form" (ngSubmit)="siguientePaso()" #f="ngForm" novalidate>
 
-  <button type="submit">Siguiente</button>
-</form>
+    <!-- Sección: Información del Vehículo -->
+    <div class="form-section">
+      <div class="section-title">
+        <i class="bi bi-car-front"></i>
+        Información del Vehículo
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-truck"></i>
+            Tipo de Vehículo
+          </label>
+          <input
+            class="form-control"
+            [(ngModel)]="autoForm().tipoVehiculo"
+            name="tipoVehiculo"
+            placeholder="Ejemplo: Sedán, SUV, Hatchback"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-hash"></i>
+            Matrícula
+          </label>
+          <input
+            class="form-control"
+            [(ngModel)]="autoForm().matricula"
+            name="matricula"
+            placeholder="ABC-1234"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-calendar"></i>
+            Año del Vehículo
+          </label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="autoForm().anio"
+            name="anioVehiculo"
+            placeholder="2024"
+            min="1990"
+            max="2025"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-award"></i>
+            Marca del Vehículo
+          </label>
+          <input
+            class="form-control"
+            [(ngModel)]="autoForm().marca"
+            name="marcaVehiculo"
+            placeholder="Toyota, Honda, Ford..."
+            required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-car-front-fill"></i>
+            Modelo del Vehículo
+          </label>
+          <input
+            class="form-control"
+            [(ngModel)]="autoForm().modelo"
+            name="modeloVehiculo"
+            placeholder="Corolla, Civic, Focus..."
+            required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-fuel-pump"></i>
+            Tipo de Combustible
+          </label>
+          <select
+            class="form-control"
+            [(ngModel)]="autoForm().tipoCombustible"
+            name="tipoCombustible"
+            required>
+            <option value="">Seleccione el combustible</option>
+            <option value="gasolina">Gasolina</option>
+            <option value="diesel">Diésel</option>
+            <option value="hibrido">Híbrido</option>
+            <option value="electrico">Eléctrico</option>
+            <option value="gas">Gas Natural/GLP</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Cobertura -->
+    <div class="form-section">
+      <div class="section-title">
+        <i class="bi bi-shield-check"></i>
+        Tipo de Cobertura
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-umbrella"></i>
+            Cobertura Deseada
+          </label>
+          <select
+            class="form-control"
+            [(ngModel)]="autoForm().cobertura"
+            name="cobertura"
+            required>
+            <option value="">Seleccione tipo de cobertura</option>
+            <option value="basica">Básica - Responsabilidad Civil</option>
+            <option value="amplia">Amplia - Todo Riesgo</option>
+            <option value="completa">Completa - Cobertura Total</option>
+            <option value="terceros">Terceros - Daños a Terceros</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Servicios Adicionales -->
+    <div class="form-section">
+      <div class="section-title">
+        <i class="bi bi-plus-circle"></i>
+        Servicios Adicionales
+      </div>
+
+      <div class="checkbox-group">
+        <label class="checkbox-item" [class.checked]="autoForm().asistenciaVial">
+          <input
+            type="checkbox"
+            [(ngModel)]="autoForm().asistenciaVial"
+            name="asistenciaVial">
+          <span>Asistencia Vial 24/7</span>
+          <i class="bi bi-tools"></i>
+        </label>
+
+        <label class="checkbox-item" [class.checked]="autoForm().vehiculoSustituto">
+          <input
+            type="checkbox"
+            [(ngModel)]="autoForm().vehiculoSustituto"
+            name="vehiculoSustituto">
+          <span>Vehículo Sustituto</span>
+          <i class="bi bi-arrow-repeat"></i>
+        </label>
+      </div>
+
+      <!-- Tarjeta informativa -->
+      <div class="info-card">
+        <i class="bi bi-info-circle"></i>
+        <div class="info-content">
+          <h4>Información Importante</h4>
+          <ul>
+            <li>La matrícula debe estar vigente y a su nombre</li>
+            <li>El vehículo será inspeccionado antes de la emisión de la póliza</li>
+            <li>Los servicios adicionales pueden tener costo extra</li>
+            <li>La cobertura amplia incluye daños por fenómenos naturales</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline-secondary" (click)="retroceder()">
+        <i class="bi bi-arrow-left"></i>
+        Anterior
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="!f.valid">
+        <i class="bi bi-arrow-right"></i>
+        Siguiente
+      </button>
+    </div>
+
+  </form>
+</div>

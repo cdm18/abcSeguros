@@ -1,18 +1,161 @@
-<h2>Detalles de Seguro de Vida</h2>
-<p>Informacion especifica del seguro</p>
+<div class="step3-vida">
+  <div class="step-header">
+    <h2>Detalles de Seguro de Vida</h2>
+    <p class="step-subtitle">Complete la información específica para su seguro de vida</p>
+  </div>
 
-<form (ngSubmit)="siguientePaso()">
-  <input [(ngModel)]="vidaForm().genero" name="genero" placeholder="Género">
-  <input [(ngModel)]="vidaForm().estadoCivil" name="estadoCivil" placeholder="Estado Civil">
-  <input [(ngModel)]="vidaForm().profesion" name="profesion" placeholder="Profesión o actividad principal">
-  <input [(ngModel)]="vidaForm().enfermedades" name="enfermedades" placeholder="Historial de enfermedades relevantes">
+  <form class="vida-form" (ngSubmit)="siguientePaso()">
 
-  <label><input type="checkbox" [(ngModel)]="vidaForm().fuma" name="fuma"> Fuma</label>
-  <label><input type="checkbox" [(ngModel)]="vidaForm().alcohol" name="alcohol"> Consume alcohol</label>
-  <label><input type="checkbox" [(ngModel)]="vidaForm().deporte" name="deporte"> Deporte extremo</label>
-  <label><input type="checkbox" [(ngModel)]="vidaForm().discapacidad" name="discapacidad"> Discapacidad</label>
-  <label><input type="checkbox" [(ngModel)]="vidaForm().enfermedadesFamiliares" name="enfermedadesFamiliares"> Enfermedades en familia</label>
-  <label><input type="checkbox" [(ngModel)]="vidaForm().hospitalizaciones" name="hospitalizaciones"> Hospitalizado últimos 5 años</label>
+    <!-- Información Personal -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-person-circle"></i>
+        Información Personal
+      </h3>
 
-  <button type="submit">Siguiente</button>
-</form>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="genero" class="form-label">
+            <i class="bi bi-gender-ambiguous"></i>
+            Género
+          </label>
+          <select id="genero" [(ngModel)]="vidaForm().genero" name="genero" class="form-control" required>
+            <option value="">Seleccione su género</option>
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="estadoCivil" class="form-label">
+            <i class="bi bi-heart"></i>
+            Estado Civil
+          </label>
+          <select id="estadoCivil" [(ngModel)]="vidaForm().estadoCivil" name="estadoCivil" class="form-control"
+                  required>
+            <option value="">Seleccione su estado civil</option>
+            <option value="soltero">Soltero/a</option>
+            <option value="casado">Casado/a</option>
+            <option value="divorciado">Divorciado/a</option>
+            <option value="viudo">Viudo/a</option>
+            <option value="union_libre">Unión libre</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="profesion" class="form-label">
+          <i class="bi bi-briefcase"></i>
+          Profesión o Actividad Principal
+        </label>
+        <input
+          type="text"
+          id="profesion"
+          [(ngModel)]="vidaForm().profesion"
+          name="profesion"
+          class="form-control"
+          placeholder="Ej: Ingeniero, Médico, Comerciante..."
+          required>
+      </div>
+    </div>
+
+    <!-- Historial Médico -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-clipboard2-pulse"></i>
+        Historial Médico
+      </h3>
+
+      <div class="form-group">
+        <label for="enfermedades" class="form-label">
+          <i class="bi bi-journal-medical"></i>
+          Historial de Enfermedades Relevantes
+        </label>
+        <textarea
+          id="enfermedades"
+          [(ngModel)]="vidaForm().enfermedades"
+          name="enfermedades"
+          class="form-control"
+          placeholder="Describa brevemente cualquier enfermedad relevante que haya padecido..."
+          rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- Factores de Riesgo -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="bi bi-exclamation-triangle"></i>
+        Factores de Riesgo
+      </h3>
+
+      <div class="checkbox-group">
+        <div class="checkbox-item" [class.checked]="vidaForm().fuma">
+          <input type="checkbox" id="fuma" [(ngModel)]="vidaForm().fuma" name="fuma">
+          <label for="fuma">Fumador (cigarro, pipa, etc.)</label>
+        </div>
+
+        <div class="checkbox-item" [class.checked]="vidaForm().alcohol">
+          <input type="checkbox" id="alcohol" [(ngModel)]="vidaForm().alcohol" name="alcohol">
+          <label for="alcohol">Consume alcohol regularmente</label>
+        </div>
+
+        <div class="checkbox-item" [class.checked]="vidaForm().deporte">
+          <input type="checkbox" id="deporte" [(ngModel)]="vidaForm().deporte" name="deporte">
+          <label for="deporte">Practica deportes extremos</label>
+        </div>
+
+        <div class="checkbox-item" [class.checked]="vidaForm().discapacidad">
+          <input type="checkbox" id="discapacidad" [(ngModel)]="vidaForm().discapacidad" name="discapacidad">
+          <label for="discapacidad">Tiene alguna discapacidad</label>
+        </div>
+
+        <div class="checkbox-item" [class.checked]="vidaForm().enfermedadesFamiliares">
+          <input type="checkbox" id="enfermedadesFamiliares" [(ngModel)]="vidaForm().enfermedadesFamiliares"
+                 name="enfermedadesFamiliares">
+          <label for="enfermedadesFamiliares">Antecedentes familiares de enfermedades graves</label>
+        </div>
+
+        <div class="checkbox-item" [class.checked]="vidaForm().hospitalizaciones">
+          <input type="checkbox" id="hospitalizaciones" [(ngModel)]="vidaForm().hospitalizaciones"
+                 name="hospitalizaciones">
+          <label for="hospitalizaciones">Hospitalizado en los últimos 5 años</label>
+        </div>
+      </div>
+
+      <!-- Tarjeta informativa -->
+      <div class="info-card">
+        <i class="bi bi-info-circle"></i>
+        <div class="info-content">
+          <h4>Información Importante</h4>
+          <ul>
+            <li>Toda la información proporcionada será verificada durante el proceso de suscripción</li>
+            <li>La veracidad de los datos afecta directamente la validez de su póliza</li>
+            <li>Los factores de riesgo pueden influir en el costo de su prima</li>
+            <li>Es importante ser completamente honesto para evitar problemas futuros</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones del formulario -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="retroceder()">
+        <i class="bi bi-arrow-left"></i>
+        Anterior
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!formEsValido()">
+        Siguiente
+        <i class="bi bi-arrow-right"></i>
+      </button>
+
+    </div>
+  </form>
+</div>

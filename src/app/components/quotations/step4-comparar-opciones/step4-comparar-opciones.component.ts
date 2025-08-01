@@ -25,7 +25,10 @@ export class Step4CompararOpcionesComponent implements OnChanges {
 
   constructor(private planOptionsSvc: PlanOptionsService) {}   // ← renombrado
 
-  ngOnChanges() { this.cargarOpciones(); }
+  ngOnChanges() {
+    console.log('📦 planBaseId recibido:', this.planBaseId);
+    this.cargarOpciones();
+  }
 
   private cargarOpciones(): void {
     if (!this.planBaseId) { this.planOptions = []; return; }
@@ -44,4 +47,7 @@ export class Step4CompararOpcionesComponent implements OnChanges {
   }
 
   retroceder() { this.prev.emit(); }
+
+
 }
+

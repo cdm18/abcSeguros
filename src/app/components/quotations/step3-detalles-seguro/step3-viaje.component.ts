@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SeguroViaje }  from '../../../models/insurance-details.model';
 
 @Component({
   selector: 'app-step3-viaje',
@@ -10,16 +11,17 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./step3-viaje.component.scss']
 })
 export class Step3ViajeComponent {
-  @Output() continuar = new EventEmitter<any>();
-  @Output() prev = new EventEmitter<void>();
+  @Output() prev      = new EventEmitter<void>();
+  @Output() continuar = new EventEmitter<void>();
 
-  viajeForm = signal({
-    fechaInicio: '',
-    fechaFin: '',
-    destino: '',
-    paisResidencia: '',
-    motivoViaje: '',
-    cobertura: ''
+
+  viajeForm = signal<SeguroViaje>({
+    fechaInicio    : '',
+    fechaFin       : '',
+    destino        : '',
+    paisResidencia : '',
+    motivo         : '',
+    cobertura      : ''
   });
 
   // Validación personalizada para las fechas
@@ -50,18 +52,8 @@ export class Step3ViajeComponent {
     }));
   }
 
-  siguientePaso() {
-    if (this.validateDates()) {
-      this.continuar.emit(this.viajeForm());
-    } else {
-      // Mostrar mensaje de error de fechas
-      alert('Por favor verifica que las fechas sean válidas');
-    }
-  }
-
-  retroceder() {
-    this.prev.emit();
-  }
+  retroceder()   { this.prev.emit();      }
+  siguientePaso(){ this.continuar.emit(); }
 
   // Método para obtener la fecha mínima (hoy)
   get minDate(): string {
@@ -99,7 +91,7 @@ export class Step3ViajeComponent {
       form.fechaFin &&
       form.destino &&
       form.paisResidencia &&
-      form.motivoViaje &&
+      form.motivo &&
       form.cobertura &&
       this.validateDates()
     );

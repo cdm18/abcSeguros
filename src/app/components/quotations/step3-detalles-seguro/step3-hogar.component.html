@@ -1,14 +1,185 @@
-<h2>Detalles de Seguro de Hogar</h2>
-<p>Informacion especifica del seguro</p>
+<!-- step3-hogar.component.html -->
+<div class="step3-hogar">
 
-<form (ngSubmit)="siguientePaso()">
-  <input [(ngModel)]="hogarForm().tipoPropiedad" name="tipoPropiedad" placeholder="Tipo de Propiedad">
-  <input [(ngModel)]="hogarForm().direccion" name="direccion" placeholder="Dirección">
-  <input [(ngModel)]="hogarForm().ciudad" name="ciudad" placeholder="Ciudad/Provincia">
-  <input [(ngModel)]="hogarForm().metrosCuadrados" name="metrosCuadrados" placeholder="Metros Cuadrados Construidos">
-  <input [(ngModel)]="hogarForm().pisos" name="pisos" placeholder="Número de Pisos">
-  <input [(ngModel)]="hogarForm().valorContenido" name="valorContenido" placeholder="Valor aproximado del contenido">
-  <input [(ngModel)]="hogarForm().valorPropiedad" name="valorPropiedad" placeholder="Valor aproximado de propiedad">
+  <!-- Header del paso -->
+  <div class="step-header">
+    <h2>Detalles de Seguro de Hogar</h2>
+    <p class="step-subtitle">Información específica de su propiedad</p>
+  </div>
 
-  <button type="submit">Siguiente</button>
-</form>
+  <!-- Formulario principal -->
+  <form class="hogar-form" (ngSubmit)="siguientePaso()" #f="ngForm" novalidate>
+
+    <!-- Detalles de la Propiedad -->
+    <fieldset class="form-section">
+      <legend><i class="bi bi-house"></i> Información de la Propiedad</legend>
+
+      <div class="mb-3">
+        <label class="form-label">
+          <i class="bi bi-building"></i>
+          Tipo de Propiedad
+        </label>
+        <select class="form-select"
+                name="tipoPropiedad"
+                [(ngModel)]="hogarForm().tipoPropiedad"
+                required>
+          <option value="" disabled selected>Selecciona el tipo de propiedad</option>
+          <option value="casa">Casa Independiente</option>
+          <option value="departamento">Departamento/Apartamento</option>
+          <option value="condominio">Condominio</option>
+          <option value="townhouse">Casa en Condominio</option>
+          <option value="duplex">Dúplex</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">
+          <i class="bi bi-geo-alt"></i>
+          Dirección Completa
+        </label>
+        <input class="form-control"
+               name="direccion"
+               [(ngModel)]="hogarForm().direccion"
+               placeholder="Calle, número, colonia..."
+               required/>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">
+          <i class="bi bi-pin-map"></i>
+          Ciudad
+        </label>
+        <input class="form-control"
+               name="ciudad"
+               [(ngModel)]="hogarForm().ciudad"
+               placeholder="Ciudad, Estado"
+               required/>
+      </div>
+    </fieldset>
+
+    <!-- Dimensiones -->
+    <fieldset class="form-section">
+      <legend><i class="bi bi-rulers"></i> Dimensiones y Estructura</legend>
+
+      <div class="row g-3">
+        <div class="col">
+          <label class="form-label">
+            <i class="bi bi-aspect-ratio"></i>
+            Metros Construidos (m²)
+          </label>
+          <input type="number"
+                 class="form-control"
+                 name="metrosConstruidos"
+                 min="20"
+                 max="2000"
+                 step="1"
+                 [(ngModel)]="hogarForm().metrosConstruidos"
+                 placeholder="150"
+                 required>
+        </div>
+
+        <div class="col">
+          <label class="form-label">
+            <i class="bi bi-layers"></i>
+            Número de Pisos
+          </label>
+          <select class="form-select"
+                  name="pisos"
+                  [(ngModel)]="hogarForm().pisos"
+                  required>
+            <option value="1">1 Piso</option>
+            <option value="2">2 Pisos</option>
+            <option value="3">3 Pisos</option>
+            <option value="4">4+ Pisos</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tarjeta informativa -->
+      <div class="info-card">
+        <i class="bi bi-info-circle"></i>
+        <div class="info-content">
+          <h4>Datos de Construcción</h4>
+          <ul>
+            <li>Los metros cuadrados deben incluir toda el área construida</li>
+            <li>Incluya sótanos y áticos en el conteo de pisos si son habitables</li>
+            <li>Para condominios, considere solo su unidad individual</li>
+          </ul>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Valuaciones -->
+    <fieldset class="form-section">
+      <legend><i class="bi bi-cash-stack"></i> Valores Asegurables</legend>
+
+      <div class="row g-3">
+        <div class="col">
+          <label class="form-label">
+            <i class="bi bi-box-seam"></i>
+            Valor del Contenido (USD)
+          </label>
+          <input type="number"
+                 class="form-control"
+                 name="valorContenido"
+                 min="1000"
+                 max="500000"
+                 step="1000"
+                 [(ngModel)]="hogarForm().valorContenido"
+                 placeholder="25000"
+                 required>
+          <small class="text-muted">Muebles, electrodomésticos, pertenencias personales</small>
+        </div>
+
+        <div class="col">
+          <label class="form-label">
+            <i class="bi bi-house-fill"></i>
+            Valor de la Propiedad (USD)
+          </label>
+          <input type="number"
+                 class="form-control"
+                 name="valorPropiedad"
+                 min="10000"
+                 max="5000000"
+                 step="10000"
+                 [(ngModel)]="hogarForm().valorPropiedad"
+                 placeholder="150000"
+                 required>
+          <small class="text-muted">Valor comercial o de reconstrucción</small>
+        </div>
+      </div>
+
+      <!-- Tarjeta informativa de valores -->
+      <div class="info-card">
+        <i class="bi bi-calculator"></i>
+        <div class="info-content">
+          <h4>Guía de Valuación</h4>
+          <ul>
+            <li><strong>Contenido:</strong> Estime el costo de reemplazar todos sus bienes</li>
+            <li><strong>Propiedad:</strong> Use el valor comercial actual o costo de reconstrucción</li>
+            <li>Los valores serán verificados durante la inspección</li>
+            <li>Puede solicitar una tasación profesional si lo requiere</li>
+          </ul>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Acciones -->
+    <div class="mt-4 d-flex justify-content-between">
+      <button type="button"
+              class="btn btn-outline-secondary"
+              (click)="retroceder()">
+        <i class="bi bi-arrow-left"></i>
+        Anterior
+      </button>
+
+      <button type="submit"
+              class="btn btn-primary"
+              [disabled]="!f.valid">
+        Siguiente
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </div>
+
+  </form>
+</div>

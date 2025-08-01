@@ -1,37 +1,38 @@
-<!-- step3-detalles-seguro.component.html -->
-<div class="container mt-4">
-  <h2 class="mb-3">Detalles del Seguro Seleccionado</h2>
+<!-- src/app/components/quotations/step3-detalles-seguro/step3-detalles-seguro.component.html -->
+<div>
+  <!-- Aviso si no se reconoce -->
+  <div *ngIf="planCode() === 'DESCONOCIDO'; else selectorReal"
+       class="alert alert-warning d-flex justify-content-between align-items-center">
+    <span>Por favor, elige un plan válido.</span>
+    <button class="btn btn-sm btn-secondary" (click)="emitirPrev()">Volver</button>
+  </div>
 
-  <!-- Mostrar componente según tipo de seguro -->
-  <ng-container [ngSwitch]="tipoSeguro">
+  <ng-template #selectorReal>
+    <ng-container [ngSwitch]="planCode()">
 
-    <app-step3-auto
-      *ngSwitchCase="2"
-      (continuar)="next.emit($event)"
-      (prev)="prev.emit()">
-    </app-step3-auto>
+      <app-step3-auto  *ngSwitchCase="'AUTO'"
+                       (prev)="emitirPrev()"
+                       (continuar)="emitirNext()">
+      </app-step3-auto>
 
-    <app-step3-hogar
-      *ngSwitchCase="4"
-      (continuar)="next.emit($event)"
-      (prev)="prev.emit()">
-    </app-step3-hogar>
+      <app-step3-hogar *ngSwitchCase="'HOGAR'"
+                       (prev)="emitirPrev()"
+                       (continuar)="emitirNext()">
+      </app-step3-hogar>
 
-    <app-step3-viaje
-      *ngSwitchCase="1"
-      (continuar)="next.emit($event)"
-      (prev)="prev.emit()">
-    </app-step3-viaje>
+      <app-step3-viaje *ngSwitchCase="'VIAJE'"
+                       (prev)="emitirPrev()"
+                       (continuar)="emitirNext()">
+      </app-step3-viaje>
 
-    <app-step3-vida
-      *ngSwitchCase="3"
-      (continuar)="next.emit($event)"
-      (prev)="prev.emit()">
-    </app-step3-vida>
+      <app-step3-vida  *ngSwitchCase="'VIDA'"
+                       (prev)="emitirPrev()"
+                       (continuar)="emitirNext()">
+      </app-step3-vida>
 
-    <p *ngSwitchDefault class="text-danger">
-      ⚠️ Por favor seleccione un tipo de seguro válido.
-    </p>
-
-  </ng-container>
+      <div *ngSwitchDefault class="alert alert-warning">
+        El tipo de seguro seleccionado aún no está soportado.
+      </div>
+    </ng-container>
+  </ng-template>
 </div>
